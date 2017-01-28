@@ -27,8 +27,8 @@ See the full license in the file "LICENSE" in the top level distribution directo
  *************************************************************************************/
 /*  END LEGAL */
 
-#ifndef Hadrons_Meson_hpp_
-#define Hadrons_Meson_hpp_
+#ifndef Hadrons_TwoPion_hpp_
+#define Hadrons_TwoPion_hpp_
 
 #include <Grid/Hadrons/Global.hpp>
 #include <Grid/Hadrons/Module.hpp>
@@ -45,6 +45,7 @@ BEGIN_MODULE_NAMESPACE(MContraction)
         public:
                 GRID_SERIALIZABLE_CLASS_MEMBERS(TwoPionPar,
                                 std::string, q1,
+                                std::string, q2,
                                 std::string, output);
 };
 
@@ -58,7 +59,7 @@ class TTwoPion: public Module<TwoPionPar>
         {
                 public:
                         GRID_SERIALIZABLE_CLASS_MEMBERS(Result,
-                                        std::vector<std::vector<std::vector<Complex>>>, corr);
+                                        std::vector<Complex>, corr);
         };
         public:
                 // constructor
@@ -87,7 +88,7 @@ TTwoPion<FImpl1, FImpl2>::TTwoPion(const std::string name)
         template <typename FImpl1, typename FImpl2>
 std::vector<std::string> TTwoPion<FImpl1, FImpl2>::getInput(void)
 {
-        std::vector<std::string> input = {par().q1};
+        std::vector<std::string> input = {par().q1, par().q2};
 
         return input;
 }
@@ -105,32 +106,32 @@ std::vector<std::string> TTwoPion<FImpl1, FImpl2>::getOutput(void)
 void TTwoPion<FImpl1, FImpl2>::execute(void)
 {
     LOG(Message) << "Computing meson contractions '" << getName() << "' using"
-            << " quarks '" << par().q1 "' and its adjoint'"
-            << std::endl;
-
+                 << " quarks '" << par().q1 << "' and '" << par().q2 << "'"
+                 << std::endl;
+    
     XmlWriter             writer(par().output);
     PropagatorField1      &q1 = *env().template getObject<PropagatorField1>(par().q1);
+    PropagatorField2      &q2 = *env().template getObject<PropagatorField2>(par().q2);
     LatticeComplex        c(env().getGrid());
     SpinMatrix            g5;
     std::vector<TComplex> buf;
     Result                result;
 
     g5 = makeGammaProd(Ns*Ns - 1);
-    result.corr.resize(1);
-    c = 2*(trace(q1*g5*adj(q1)*g5) ;
+    c = trace(q1*g5*adj(q2)*g5);
     sliceSum(c, buf, Tp);
-    result.corr[0].resize(buf.size());
+    result.corr.resize(buf.size());
     for (unsigned int t = 0; t < buf.size(); ++t)
     {
-            result.corr[iSink][iSrc][t] = TensorRemove(buf[t]);
+            result.corr[t] = TensorRemove(buf[t]);
     }
 
 
-    write(writer, "meson", result);
+    write(writer, "twopion", result);
 }
 
 END_MODULE_NAMESPACE
 
 END_HADRONS_NAMESPACE
 
-#endif // Hadrons_Meson_hpp_
+#endif // Hadrons_TwoPion_hpp_

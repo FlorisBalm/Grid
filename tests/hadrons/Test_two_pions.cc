@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     // run setup ///////////////////////////////////////////////////////////////
     Application              application;
     std::string flavour = "l";
-    double mass = 0.01
+    double mass = 0.01;
     
     // global parameters
     Application::GlobalPar globalPar;
@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
     MAction::Wilson::Par actionPar;
     actionPar.gauge = "gauge";
     actionPar.mass  = mass;
-    application.createModule<MAction::Wilson>("Wilson_" + flavour[i], actionPar);
+    application.createModule<MAction::Wilson>("Wilson_" + flavour, actionPar);
     
     // solvers
     MSolver::RBPrecCG::Par solverPar;
@@ -77,12 +77,14 @@ int main(int argc, char *argv[])
     quarkPar.solver = "CG_" + flavour;
     quarkPar.source = "pt";
     application.createModule<Quark>("Qpt_" + flavour, quarkPar);
+
     MContraction::TwoPion::Par mesPar;
 
     mesPar.output = "pions/pt_" + flavour + flavour;
     mesPar.q1     = "Qpt_" + flavour;
-    application.createModule<MContraction::Meson>("meson_pt_"
-                                                      + flavour,
+    mesPar.q2     = "Qpt_" + flavour; 
+    application.createModule<MContraction::TwoPion>("twopi_pt_"
+                                                      + flavour + flavour,
                                                       mesPar);
     
     // execution
