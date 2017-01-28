@@ -26,7 +26,7 @@
  *******************************************************************************/
 
 #include <Grid/Hadrons/Application.hpp>
-
+#include <Grid/Hadrons/Modules/MContraction/TwoPion.hpp>
 using namespace Grid;
 using namespace Hadrons;
 
@@ -45,7 +45,6 @@ int main(int argc, char *argv[])
     Application              application;
     std::string flavour = "l";
     double mass = 0.01;
-    
     // global parameters
     Application::GlobalPar globalPar;
     globalPar.trajCounter.start = 1500;

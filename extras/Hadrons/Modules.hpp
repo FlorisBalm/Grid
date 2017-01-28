@@ -5,7 +5,6 @@
 #include <Grid/Hadrons/Modules/MAction/Wilson.hpp>
 #include <Grid/Hadrons/Modules/MAction/DWF.hpp>
 #include <Grid/Hadrons/Modules/MContraction/Baryon.hpp>
-#include <Grid/Hadrons/Modules/MContraction/PiPi.hpp>
 #include <Grid/Hadrons/Modules/MContraction/TwoPion.hpp>
 #include <Grid/Hadrons/Modules/MContraction/Meson.hpp>
 #include <Grid/Hadrons/Modules/MSource/SeqGamma.hpp>

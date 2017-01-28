@@ -99,7 +99,6 @@ std::vector<std::string> TTwoPion<FImpl1, FImpl2>::getOutput(void)
         std::vector<std::string> output = {getName()};
 
         return output;
-}
 
 // execution ///////////////////////////////////////////////////////////////////
         template <typename FImpl1, typename FImpl2>

@@ -1,8 +1,7 @@
 modules_cc =\
   Modules/MGauge/Load.cc \
   Modules/MGauge/Unit.cc \
-  Modules/MGauge/Random.cc \
-  Modules/MContraction/PiPi.cc
+  Modules/MGauge/Random.cc
 
 modules_hpp =\
   Modules/Quark.hpp \
@@ -12,7 +11,6 @@ modules_hpp =\
   Modules/MAction/Wilson.hpp \
   Modules/MAction/DWF.hpp \
   Modules/MContraction/Baryon.hpp \
-  Modules/MContraction/PiPi.hpp \
   Modules/MContraction/TwoPion.hpp \
   Modules/MContraction/Meson.hpp \
   Modules/MSource/SeqGamma.hpp \
