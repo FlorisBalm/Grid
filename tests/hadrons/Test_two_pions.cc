@@ -27,6 +27,7 @@
 
 #include <Grid/Hadrons/Application.hpp>
 #include <Grid/Hadrons/Modules/MContraction/TwoPion.hpp>
+#include <ctime>
 using namespace Grid;
 using namespace Hadrons;
 
@@ -44,6 +45,8 @@ int main(int argc, char *argv[])
     // run setup ///////////////////////////////////////////////////////////////
     Application              application;
     std::string flavour = "l";
+    std::string down = "d";
+    std::string up = "u";
     double mass = 0.01;
     // global parameters
     Application::GlobalPar globalPar;
@@ -79,11 +82,17 @@ int main(int argc, char *argv[])
 
     MContraction::TwoPion::Par mesPar;
 
-    mesPar.output = "pions/pt_" + flavour + flavour;
+    //Find current time for file to write to
+    time_t t = time(0);
+    struct tm* now = localtime(&t);
+    char buffer[80];
+    strftime(buffer, 80, "%Y%m%d-%H%M%S",now);
+    std::string current_time(buffer);
+    
+    mesPar.output = "pions/pt_" + flavour + ;
     mesPar.q1     = "Qpt_" + flavour;
-    mesPar.q2     = "Qpt_" + flavour; 
     application.createModule<MContraction::TwoPion>("twopi_pt_"
-                                                      + flavour + flavour,
+                                                      + flavour,
                                                       mesPar);
     
     // execution
