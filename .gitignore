@@ -89,6 +89,7 @@ Thumbs.db
 # build directory #
 ###################
 build*/*
+!build/tests/hadrons/*
 
 # IDE related files #
 #####################

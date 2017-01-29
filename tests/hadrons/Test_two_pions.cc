@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
     std::string flavour = "l";
     std::string down = "d";
     std::string up = "u";
-    double mass = 0.01;
+    double mass = 1;
     // global parameters
     Application::GlobalPar globalPar;
     globalPar.trajCounter.start = 1500;
@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
     strftime(buffer, 80, "%Y%m%d-%H%M%S",now);
     std::string current_time(buffer);
     
-    mesPar.output = "pions/pt_" + flavour + ;
+    mesPar.output = "pions/pt_" + flavour + "_" + current_time; 
     mesPar.q1     = "Qpt_" + flavour;
     application.createModule<MContraction::TwoPion>("twopi_pt_"
                                                       + flavour,
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
     // execution
     application.saveParameterFile("TwoPion.xml");
     application.run();
-    
+     
     // epilogue
     LOG(Message) << "Grid is finalizing now" << std::endl;
     Grid_finalize();
