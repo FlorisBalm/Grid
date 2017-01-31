@@ -114,7 +114,7 @@ void TTwoPion<FImpl1>::execute(void)
     Result                result;
 
     g5 = makeGammaProd(Ns*Ns - 1);
-    c = (trace(q1*g5*g5*adj(q1)*g5*g5)*trace(q1*g5*g5*adj(q1)*g5*g5) + trace(q1*g5*g5*adj(q1)*g5*g5*q1*g5*g5*adj(q1)*g5*g5));
+    c = (trace(q1*g5*g5*adj(q1)*g5*g5)*trace(q1*g5*g5*adj(q1)*g5*g5) + trace(q1*g5*g5*adj(q1)*g5*g5*q1*g5*g5*adj(q1)*g5*g5))+(trace(q1*g5*g5*adj(q1)*g5*g5)*trace(q1*g5*g5*adj(q1)*g5*g5) + trace(q1*g5*g5*adj(q1)*g5*g5*q1*g5*g5*adj(q1)*g5*g5));
     sliceSum(c, buf, Tp);
     result.corr.resize(buf.size());
     for (unsigned int t = 0; t < buf.size(); ++t)
