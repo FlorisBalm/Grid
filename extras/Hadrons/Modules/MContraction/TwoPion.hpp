@@ -109,11 +109,10 @@ void TTwoPion<FImpl1>::execute(void)
     XmlWriter             writer(par().output);
     PropagatorField1      &q1 = *env().template getObject<PropagatorField1>(par().q1);
     LatticeComplex        c(env().getGrid());
-    SpinMatrix            g5;
+    Gamma                 g5(Gamma::Algebra::Gamma5);
     std::vector<TComplex> buf;
     Result                result;
 
-    g5 = makeGammaProd(Ns*Ns - 1);
     c = (trace(q1*g5*g5*adj(q1)*g5*g5)*trace(q1*g5*g5*adj(q1)*g5*g5) + trace(q1*g5*g5*adj(q1)*g5*g5*q1*g5*g5*adj(q1)*g5*g5))+(trace(q1*g5*g5*adj(q1)*g5*g5)*trace(q1*g5*g5*adj(q1)*g5*g5) + trace(q1*g5*g5*adj(q1)*g5*g5*q1*g5*g5*adj(q1)*g5*g5));
     sliceSum(c, buf, Tp);
     result.corr.resize(buf.size());
@@ -121,8 +120,6 @@ void TTwoPion<FImpl1>::execute(void)
     {
             result.corr[t] = TensorRemove(buf[t]);
     }
-
-
     write(writer, "twopion", result);
 }
 
