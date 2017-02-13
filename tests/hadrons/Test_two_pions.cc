@@ -55,6 +55,10 @@ int main(int argc, char *argv[])
     globalPar.trajCounter.step  = 10;
     globalPar.seed              = "0 2 3 4";
     application.setPar(globalPar);
+    auto x = Environment::getInstance().getGrid();
+    for(auto i :x->FullDimensions()){
+            std::cout<<i<<std::endl;
+    }
     // gauge field
     application.createModule<MGauge::Unit>("gauge");
     // sources
