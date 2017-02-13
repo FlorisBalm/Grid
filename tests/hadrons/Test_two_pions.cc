@@ -50,10 +50,10 @@ int main(int argc, char *argv[])
     double mass = 1;
     // global parameters
     Application::GlobalPar globalPar;
-    globalPar.trajCounter.start = 1500;
-    globalPar.trajCounter.end   = 1520;
-    globalPar.trajCounter.step  = 20;
-    globalPar.seed              = "1 2 3 4";
+    globalPar.trajCounter.start = 1450;
+    globalPar.trajCounter.end   = 1500;
+    globalPar.trajCounter.step  = 10;
+    globalPar.seed              = "0 2 3 4";
     application.setPar(globalPar);
     // gauge field
     application.createModule<MGauge::Unit>("gauge");
