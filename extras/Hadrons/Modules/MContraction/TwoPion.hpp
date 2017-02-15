@@ -39,20 +39,26 @@ BEGIN_HADRONS_NAMESPACE
  *                                TTwoPion                                       *
  ******************************************************************************/
 BEGIN_MODULE_NAMESPACE(MContraction)
-
         class TwoPionPar: Serializable
 {
         public:
                 GRID_SERIALIZABLE_CLASS_MEMBERS(TwoPionPar,
                                 std::string, q1,
+                                std::string, q2,
+                                std::string, q3,
+                                std::string, q4,
                                 std::string, output);
 };
 
-template <typename FImpl1>
+template <typename FImpl1, typename FImpl2, typename FImpl3,typename FImpl4>
 class TTwoPion: public Module<TwoPionPar>
 {
         public:
                 TYPE_ALIASES(FImpl1, 1);
+                TYPE_ALIASES(FImpl2,2);
+                TYPE_ALIASES(FImpl3,3);
+                TYPE_ALIASES(FImpl4,4);
+
                 class Result: Serializable
         {
                 public:
@@ -71,28 +77,28 @@ class TTwoPion: public Module<TwoPionPar>
                 virtual void execute(void);
 };
 
-MODULE_REGISTER_NS(TwoPion, ARG(TTwoPion<FIMPL>), MContraction);
+MODULE_REGISTER_NS(TwoPion, ARG(TTwoPion<FIMPL,FIMPL,FIMPL,FIMPL>), MContraction);
 
 /******************************************************************************
  *                           TTwoPion implementation                            *
  ******************************************************************************/
 // constructor /////////////////////////////////////////////////////////////////
-        template <typename FImpl1>
-TTwoPion<FImpl1>::TTwoPion(const std::string name)
+template <typename FImpl1, typename FImpl2, typename FImpl3,typename FImpl4>
+TTwoPion< FImpl1,  FImpl2,  FImpl3, FImpl4>::TTwoPion(const std::string name)
         : Module<TwoPionPar>(name)
 {}
 
 // dependencies/products ///////////////////////////////////////////////////////
-        template <typename FImpl1>
-std::vector<std::string> TTwoPion<FImpl1>::getInput(void)
+template <typename FImpl1, typename FImpl2, typename FImpl3,typename FImpl4>
+std::vector<std::string> TTwoPion< FImpl1,  FImpl2,  FImpl3, FImpl4>::getInput(void)
 {
-        std::vector<std::string> input = {par().q1};
+        std::vector<std::string> input = {par().q1, par().q2, par().q3,par().q4};
 
         return input;
 }
 
-        template <typename FImpl1>
-std::vector<std::string> TTwoPion<FImpl1>::getOutput(void)
+template <typename FImpl1, typename FImpl2, typename FImpl3,typename FImpl4>
+std::vector<std::string> TTwoPion< FImpl1,  FImpl2,  FImpl3, FImpl4>::getOutput(void)
 {
         std::vector<std::string> output = {getName()};
 
@@ -100,21 +106,30 @@ std::vector<std::string> TTwoPion<FImpl1>::getOutput(void)
         return output;
 }
 // execution ///////////////////////////////////////////////////////////////////
-        template <typename FImpl1>
-void TTwoPion<FImpl1>::execute(void)
+template <typename FImpl1, typename FImpl2, typename FImpl3,typename FImpl4>
+void TTwoPion< FImpl1,  FImpl2,  FImpl3, FImpl4>::execute(void)
 {
     LOG(Message) << "Computing meson contractions '" << getName() << "' using"
-                 << " quarks '" << par().q1 << std::endl;
+                 << " quarks '"
+                 << par().q1 << ", "  
+                 << par().q2 << ", "  
+                 << par().q3 << ", "  
+                 << par().q4   
+                 << std::endl;
     
     XmlWriter             writer(par().output);
     PropagatorField1      &q1 = *env().template getObject<PropagatorField1>(par().q1);
+    PropagatorField2      &q2 = *env().template getObject<PropagatorField2>(par().q2);
+    PropagatorField3      &q3 = *env().template getObject<PropagatorField3>(par().q3);
+    PropagatorField4      &q4 = *env().template getObject<PropagatorField4>(par().q4);
     LatticeComplex        c(env().getGrid());
     SpinMatrix            g5;
     std::vector<TComplex> buf;
     Result                result;
 
     g5 = makeGammaProd(Ns*Ns - 1);
-    c = (trace(q1*g5*g5*adj(q1)*g5*g5)*trace(q1*g5*g5*adj(q1)*g5*g5) + trace(q1*g5*g5*adj(q1)*g5*g5*q1*g5*g5*adj(q1)*g5*g5))+(trace(q1*g5*g5*adj(q1)*g5*g5)*trace(q1*g5*g5*adj(q1)*g5*g5) + trace(q1*g5*g5*adj(q1)*g5*g5*q1*g5*g5*adj(q1)*g5*g5));
+    c=trace(q1*g5*q2*g5*q3*g5*q4*g5);
+    //c = (trace(q1*g5*g5*adj(q1)*g5*g5)*trace(q1*g5*g5*adj(q1)*g5*g5) + trace(q1*g5*g5*adj(q1)*g5*g5*q1*g5*g5*adj(q1)*g5*g5))+(trace(q1*g5*g5*adj(q1)*g5*g5)*trace(q1*g5*g5*adj(q1)*g5*g5) + trace(q1*g5*g5*adj(q1)*g5*g5*q1*g5*g5*adj(q1)*g5*g5));
     sliceSum(c, buf, Tp);
     result.corr.resize(buf.size());
     for (unsigned int t = 0; t < buf.size(); ++t)

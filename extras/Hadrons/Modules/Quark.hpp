@@ -121,6 +121,7 @@ void TQuark<FImpl>::execute(void)
     std::string     propName = (Ls_ == 1) ? getName() : (getName() + "_5d");
     PropagatorField &prop    = *env().template createLattice<PropagatorField>(propName);
     PropagatorField &fullSrc = *env().template getObject<PropagatorField>(par().source);
+    std::cout<<"Source: " << par().source << std::endl;
     SolverFn        &solver  = *env().template getObject<SolverFn>(par().solver);
     if (Ls_ > 1)
     {

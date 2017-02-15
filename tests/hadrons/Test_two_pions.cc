@@ -55,10 +55,12 @@ int main(int argc, char *argv[])
     globalPar.trajCounter.step  = 10;
     globalPar.seed              = "0 2 3 4";
     application.setPar(globalPar);
+    /*
     auto x = Environment::getInstance().getGrid();
     for(auto i :x->FullDimensions()){
             std::cout<<i<<std::endl;
     }
+    */
     // gauge field
     application.createModule<MGauge::Unit>("gauge");
     // sources
@@ -95,6 +97,9 @@ int main(int argc, char *argv[])
     
     mesPar.output = "pions/pt_" + flavour + "_" + current_time; 
     mesPar.q1     = "Qpt_" + flavour;
+    mesPar.q2     = "Qpt_" + flavour;
+    mesPar.q3     = "Qpt_" + flavour;
+    mesPar.q4     = "Qpt_" + flavour;
     application.createModule<MContraction::TwoPion>("twopi_pt_"
                                                       + flavour,
                                                       mesPar);
