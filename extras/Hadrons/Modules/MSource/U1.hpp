@@ -62,7 +62,7 @@ public:
     GRID_SERIALIZABLE_CLASS_MEMBERS(U1Par,
                                     unsigned int, tA,
                                     unsigned int, tB,
-                                    std::vector<RealD>, q);
+                                    std::string, mom);
 };
 
 template <typename FImpl>
@@ -124,11 +124,17 @@ template <typename FImpl>
 void TU1<FImpl>::execute(void)
 {
     Lattice<iScalar<vInteger>> t(env().getGrid());
-    Lattice<iVector<iScalar<iScalar<vComplex>>,Nd>> coord(env().getGrid());
-    LatticeComplex            eta (env().getGrid());
+    LatticeComplex eta (env().getGrid());
+
+    LatticeComplex coord(env().getGrid());
     LatticeComplex qy(env().getGrid());
     qy=zero;
-    auto q = par().q;
+    std::vector<Real> momentum = strToVec<Real>(par().mom);
+    for(unsigned int mu = 0; mu < Nd - 1; ++mu){
+       LatticeCoordinate(coord,mu);
+       qy += momentum[mu]*coord;
+    }
+
     if (par().tA == par().tB)
     {
         LOG(Message) << "Generating U_1 wall source at t= " << par().tA
@@ -140,10 +146,6 @@ void TU1<FImpl>::execute(void)
         << par().tB << std::endl;
     }
 
-    for(unsigned int mu = 0; mu < Nd - 1; ++mu){
-       LatticeCoordinate(coord,mu);
-       qy += q[mu]*coord;
-    }
 
     LatticeCoordinate(t,Tp);
     PropagatorField &src = *env().template createLattice<PropagatorField>(getName());
@@ -152,9 +154,9 @@ void TU1<FImpl>::execute(void)
     eta = eta*TwoPi;
     eta = where((t >= par().tA) and (t <= par().tB), eta, 0.*eta);
     eta = exp(timesI(eta));
-    std::cout << eta << std::endl;
+    qy = exp(timesI(qy));
     src = 1.;
-    src = src*eta;
+    src = src*qy*eta;
 }
 
 END_MODULE_NAMESPACE

@@ -27,6 +27,7 @@
 
 #include <Grid/Hadrons/Application.hpp>
 #include <Grid/Hadrons/Modules/MSource/U1.hpp>
+#include <Grid/Hadrons/Modules/MContraction/TwoPion.hpp>
 using namespace Grid;
 using namespace Hadrons;
 
@@ -44,55 +45,92 @@ int main(int argc, char *argv[])
     // run setup ///////////////////////////////////////////////////////////////
     Application              application;
 
-    std::string flavour= "l";
-    double mass = 0.1; 
     // global parameters
     Application::GlobalPar globalPar;
     globalPar.trajCounter.start = 3425;
     globalPar.trajCounter.end   = 3445;
     globalPar.trajCounter.step  = 20;
     globalPar.seed              = "1 2 3 4";
+    
     application.setPar(globalPar);
     // gauge field
     MGauge::Load::Par loadPar;
     loadPar.file = "/home/floris/mphys/configurations/ckpoint_lat";
     application.createModule<MGauge::Load>("gauge", loadPar);
+    double mass = 0.1;
     
     auto latt_size=GridDefaultLatt();
-
     RealD twoPiL = 2.*M_PI/double(latt_size[3]);
-    MSource::U1::Par u1Par;
-    u1Par.tA=5;
-    u1Par.tB=5;
+    std::stringstream ss;
+    ss << "0 0 " << twoPiL;
+    std::stringstream ss2;
+    ss2 << "0 0 " << -twoPiL;
+    std::string momentum(ss.str()),
+                negative_momentum(ss2.str());
+    std::cout << momentum << negative_momentum << std::endl;
     
-    u1Par.q={0,0,twoPiL};
-    application.createModule<MSource::U1>("u1", u1Par);
+    MSource::U1::Par u1Par_posMomentum;
+    u1Par_posMomentum.tA=0;
+    u1Par_posMomentum.tB=0;
+    u1Par_posMomentum.mom = momentum;
+
+    application.createModule<MSource::U1>("u1_p", u1Par_posMomentum);
+
+
+    MSource::U1::Par u1Par_negMomentum;
+    u1Par_negMomentum.tA=0;
+    u1Par_negMomentum.tB=0;
+    u1Par_negMomentum.mom = negative_momentum;
+
+    application.createModule<MSource::U1>("u1_n", u1Par_negMomentum);
+
+    MSource::U1::Par u1Par_zeroMomentum;
+    u1Par_zeroMomentum.tA=0;
+    u1Par_zeroMomentum.tB=0;
+    u1Par_zeroMomentum.mom = "0 0 0";
+
+    application.createModule<MSource::U1>("u1_0", u1Par_zeroMomentum);
+
+
+    //Wilson Action
     MAction::Wilson::Par actionPar;
     actionPar.gauge = "gauge";
     actionPar.mass  = mass;
-    application.createModule<MAction::Wilson>("Wilson_" + flavour, actionPar);
+    application.createModule<MAction::Wilson>("Wilson", actionPar);
 
     // solvers
     MSolver::RBPrecCG::Par solverPar;
-    solverPar.action   = "Wilson_" + flavour;
+    solverPar.action   = "Wilson";
     solverPar.residual = 1.0e-8;
-    application.createModule<MSolver::RBPrecCG>("CG_" + flavour,
-            solverPar);
+    application.createModule<MSolver::RBPrecCG>("CG",solverPar);
 
     // propagators
-    Quark::Par quarkPar;
-    quarkPar.solver = "CG_" + flavour;
-    quarkPar.source = "u1";
-    application.createModule<Quark>("QU1_" + flavour, quarkPar);
+    Quark::Par quarkPar1;
+    quarkPar1.solver = "CG";
+    quarkPar1.source = "u1_0";
+    application.createModule<Quark>("QU1_p", quarkPar1);
 
-    MContraction::Meson::Par mesPar;
+    Quark::Par quarkPar2;
+    quarkPar1.solver = "CG";
+    quarkPar1.source = "u1_0";
+    application.createModule<Quark>("QU1_0", quarkPar2);
 
-    mesPar.output = "mesons/U1_" + flavour + flavour;
-    mesPar.q1     = "QU1_" + flavour;
-    mesPar.q2     = "QU1_" + flavour;
-    application.createModule<MContraction::Meson>("meson_U1_"
-            + flavour + flavour,
-            mesPar);
+
+    Quark::Par quarkPar3;
+    quarkPar1.solver = "CG";
+    quarkPar1.source = "u1_n";
+    application.createModule<Quark>("QU1_n", quarkPar3);
+
+    MContraction::TwoPion::Par twoPionPar;
+
+    twoPionPar.output = "twopion/U1";
+    twoPionPar.q1     = "QU1_0";
+    twoPionPar.q2     = "QU1_p";
+    twoPionPar.q3     = "QU1_0";
+    twoPionPar.q4     = "QU1_n";
+    twoPionPar.mom    = momentum;
+    application.createModule<MContraction::TwoPion>("twoPion_U1",
+            twoPionPar);
 
     // execution
     application.saveParameterFile("U1.xml");
