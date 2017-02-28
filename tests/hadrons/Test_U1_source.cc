@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
     loadPar.file = "/home/floris/mphys/configurations/ckpoint_lat";
     application.createModule<MGauge::Load>("gauge", loadPar);
     
-    std::vector<int> latt_size=GridDefaultLatt();
+    auto latt_size=GridDefaultLatt();
 
     RealD twoPiL = 2.*M_PI/double(latt_size[3]);
     MSource::U1::Par u1Par;
