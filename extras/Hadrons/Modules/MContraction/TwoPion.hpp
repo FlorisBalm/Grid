@@ -127,29 +127,31 @@ void TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4>::execute(void)
     LOG(Debug) << 126 << std::endl;
     LatticeComplex coord(env().getGrid());
     LatticeComplex py(env().getGrid());
+    LatticeComplex pyneg(env().getGrid());
+    
     py=zero;
+    pyneg=zero;
     std::vector<Real> momentum = strToVec<Real>(par().mom);
     for(unsigned int mu = 0; mu < env().getNd() - 1; ++mu){
        LatticeCoordinate(coord,mu);
        py += momentum[mu]*coord;
     }
-    auto pyneg = exp(-timesI(py));
+    
+    pyneg = exp(-timesI(py));
     py = exp(timesI(py));
     LOG(Debug) << 137 << std::endl;
     
     c = trace(py*adj(q1)*q2);
-    d = trace(pyneg*adj(q1)*q2);
+    d = trace(pyneg*adj(q3)*q4);
 
     LOG(Debug) << 140 << std::endl; 
     sliceSum(c, buf1, Tp);
     sliceSum(d,buf2,Tp);
-    LOG(Debug) << c << std::endl; 
-    LOG(Debug) << d << std::endl; 
     result.corr.resize(buf1.size());
+    
     for (unsigned int t = 0; t < buf1.size(); ++t)
     {
-        result.corr[t] = TensorRemove(buf1[t]);
-        LOG(Debug) << result.corr[t] <<std::endl;
+        result.corr[t] = TensorRemove(buf1[t])*TensorRemove(buf2[t]);
     }
     write(writer, "meson", result);
 }
