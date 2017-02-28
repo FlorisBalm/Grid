@@ -57,6 +57,8 @@ int main(int argc, char *argv[])
     MGauge::Load::Par loadPar;
     loadPar.file = "/home/floris/mphys/configurations/ckpoint_lat";
     application.createModule<MGauge::Load>("gauge", loadPar);
+    
+
     double mass = 0.1;
     
     auto latt_size=GridDefaultLatt();
@@ -67,7 +69,6 @@ int main(int argc, char *argv[])
     ss2 << "0 0 " << -twoPiL;
     std::string momentum(ss.str()),
                 negative_momentum(ss2.str());
-    std::cout << momentum << negative_momentum << std::endl;
     
     MSource::U1::Par u1Par_posMomentum;
     u1Par_posMomentum.tA=0;
@@ -83,6 +84,7 @@ int main(int argc, char *argv[])
     u1Par_negMomentum.mom = negative_momentum;
 
     application.createModule<MSource::U1>("u1_n", u1Par_negMomentum);
+
 
     MSource::U1::Par u1Par_zeroMomentum;
     u1Par_zeroMomentum.tA=0;
@@ -107,23 +109,29 @@ int main(int argc, char *argv[])
     // propagators
     Quark::Par quarkPar1;
     quarkPar1.solver = "CG";
-    quarkPar1.source = "u1_0";
+    quarkPar1.source = "u1_p";
     application.createModule<Quark>("QU1_p", quarkPar1);
 
     Quark::Par quarkPar2;
-    quarkPar1.solver = "CG";
-    quarkPar1.source = "u1_0";
+    quarkPar2.solver = "CG";
+    quarkPar2.source = "u1_0";
     application.createModule<Quark>("QU1_0", quarkPar2);
 
 
     Quark::Par quarkPar3;
-    quarkPar1.solver = "CG";
-    quarkPar1.source = "u1_n";
+    quarkPar3.solver = "CG";
+    quarkPar3.source = "u1_n";
     application.createModule<Quark>("QU1_n", quarkPar3);
 
-    MContraction::TwoPion::Par twoPionPar;
 
-    twoPionPar.output = "twopion/U1";
+    MContraction::TwoPion::Par twoPionPar;
+    time_t t = time(0);
+    struct tm* now = localtime(&t);
+    char buffer[80];
+    strftime(buffer, 80, "%Y%m%d-%H%M%S",now);
+    std::string current_time(buffer);
+    
+    twoPionPar.output = "twopion/U1_" + current_time;
     twoPionPar.q1     = "QU1_0";
     twoPionPar.q2     = "QU1_p";
     twoPionPar.q3     = "QU1_0";

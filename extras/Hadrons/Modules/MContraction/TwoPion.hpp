@@ -114,16 +114,17 @@ void TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4>::execute(void)
                  << " quarks '" << par().q1 << "' and '" << par().q2 << "' and '" 
                  << par().q3 << "' and '" << par().q4
                  << std::endl;
-     
     XmlWriter             writer(par().output);
     PropagatorField1      &q1 = *env().template getObject<PropagatorField1>(par().q1);
     PropagatorField2      &q2 = *env().template getObject<PropagatorField2>(par().q2);
     PropagatorField3      &q3 = *env().template getObject<PropagatorField3>(par().q3);
     PropagatorField4      &q4 = *env().template getObject<PropagatorField4>(par().q4);
-    LatticeComplex        c(env().getGrid());
-    std::vector<TComplex> buf;
+    LatticeComplex        c(env().getGrid()),
+                          d(env().getGrid());
+    std::vector<TComplex> buf1,buf2;
     Result                result;
 
+    LOG(Debug) << 126 << std::endl;
     LatticeComplex coord(env().getGrid());
     LatticeComplex py(env().getGrid());
     py=zero;
@@ -134,13 +135,21 @@ void TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4>::execute(void)
     }
     auto pyneg = exp(-timesI(py));
     py = exp(timesI(py));
+    LOG(Debug) << 137 << std::endl;
     
-    c = trace(pyneg*adj(q1)*q2)*trace(py*adj(q3)*q4);
-    sliceSum(c, buf, Tp);
-    result.corr.resize(buf.size());
-    for (unsigned int t = 0; t < buf.size(); ++t)
+    c = trace(py*adj(q1)*q2);
+    d = trace(pyneg*adj(q1)*q2);
+
+    LOG(Debug) << 140 << std::endl; 
+    sliceSum(c, buf1, Tp);
+    sliceSum(d,buf2,Tp);
+    LOG(Debug) << c << std::endl; 
+    LOG(Debug) << d << std::endl; 
+    result.corr.resize(buf1.size());
+    for (unsigned int t = 0; t < buf1.size(); ++t)
     {
-        result.corr[t] = TensorRemove(buf[t]);
+        result.corr[t] = TensorRemove(buf1[t]);
+        LOG(Debug) << result.corr[t] <<std::endl;
     }
     write(writer, "meson", result);
 }

@@ -93,7 +93,9 @@ MODULE_REGISTER_NS(U1, TU1<FIMPL>, MSource);
 template <typename FImpl>
 TU1<FImpl>::TU1(const std::string name)
 : Module<U1Par>(name)
-{}
+{
+}
+
 
 // dependencies/products ///////////////////////////////////////////////////////
 template <typename FImpl>
