@@ -44,9 +44,6 @@ BEGIN_MODULE_NAMESPACE(MContraction)
         public:
                 GRID_SERIALIZABLE_CLASS_MEMBERS(SingleRhoPar,
                                 std::string, q1,
-                                std::string, q2,
-                                std::string, q3,
-                                std::string, q4,
                                 std::string, output);
 };
 
@@ -117,9 +114,9 @@ void TSingleRho< FImpl1>::execute(void)
     SpinMatrix            g5, g3;
     std::vector<TComplex> buf;
     Result                result;
-    g3 = makeGammaProd(1<<3); 
+    g3 = makeGammaProd(0b0100); 
     g5 = makeGammaProd(Ns*Ns - 1);
-    c=trace(q1*g3*q1*g3);
+    c=trace(q1*g5*g3*adj(q1)*g5*adj(g3));
     //c = (trace(q1*g5*g5*adj(q1)*g5*g5)*trace(q1*g5*g5*adj(q1)*g5*g5) + trace(q1*g5*g5*adj(q1)*g5*g5*q1*g5*g5*adj(q1)*g5*g5))+(trace(q1*g5*g5*adj(q1)*g5*g5)*trace(q1*g5*g5*adj(q1)*g5*g5) + trace(q1*g5*g5*adj(q1)*g5*g5*q1*g5*g5*adj(q1)*g5*g5));
     sliceSum(c, buf, Tp);
     result.corr.resize(buf.size());
