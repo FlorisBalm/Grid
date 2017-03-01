@@ -124,7 +124,6 @@ void TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4>::execute(void)
     std::vector<TComplex> buf1,buf2;
     Result                result;
 
-    LOG(Debug) << 126 << std::endl;
     LatticeComplex coord(env().getGrid());
     LatticeComplex py(env().getGrid());
     LatticeComplex pyneg(env().getGrid());
@@ -134,17 +133,18 @@ void TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4>::execute(void)
     std::vector<Real> momentum = strToVec<Real>(par().mom);
     for(unsigned int mu = 0; mu < env().getNd() - 1; ++mu){
        LatticeCoordinate(coord,mu);
+       LOG(Debug) << coord << std::endl;
        py += momentum[mu]*coord;
     }
     
     pyneg = exp(-timesI(py));
     py = exp(timesI(py));
-    LOG(Debug) << 137 << std::endl;
+    LOG(Debug) << py << "\n" << pyneg << std::endl;
     
     c = trace(py*adj(q1)*q2);
     d = trace(pyneg*adj(q3)*q4);
 
-    LOG(Debug) << 140 << std::endl; 
+    LOG(Debug) << c << "\n" << d << std::endl;
     sliceSum(c, buf1, Tp);
     sliceSum(d,buf2,Tp);
     result.corr.resize(buf1.size());

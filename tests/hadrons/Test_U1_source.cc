@@ -46,10 +46,11 @@ int main(int argc, char *argv[])
     Application              application;
 
     // global parameters
+
     Application::GlobalPar globalPar;
     globalPar.trajCounter.start = 3425;
-    globalPar.trajCounter.end   = 3445;
-    globalPar.trajCounter.step  = 20;
+    globalPar.trajCounter.end   = 3430;
+    globalPar.trajCounter.step  = 5;
     globalPar.seed              = "1 2 3 4";
     
     application.setPar(globalPar);
@@ -123,20 +124,28 @@ int main(int argc, char *argv[])
     quarkPar3.source = "u1_n";
     application.createModule<Quark>("QU1_n", quarkPar3);
 
+    Quark::Par quarkPar4;
+    quarkPar4.solver = "CG";
+    quarkPar4.source = "u1_0";
+    application.createModule<Quark>("QU1_0_2", quarkPar4);
 
     MContraction::TwoPion::Par twoPionPar;
     time_t t = time(0);
     struct tm* now = localtime(&t);
+    
     char buffer[80];
     strftime(buffer, 80, "%Y%m%d-%H%M%S",now);
-    std::string current_time(buffer);
-    
-    twoPionPar.output = "twopion/U1_" + current_time;
+    std::string current_date(buffer);
+    strftime(buffer, 80, "%H%M%S",now);
+    std::string current_time(buffer); 
+
+    twoPionPar.output = "twopion/"+current_date+"/U1_" + current_time;
     twoPionPar.q1     = "QU1_0";
     twoPionPar.q2     = "QU1_p";
-    twoPionPar.q3     = "QU1_0";
+    twoPionPar.q3     = "QU1_0_2";
     twoPionPar.q4     = "QU1_n";
     twoPionPar.mom    = momentum;
+
     application.createModule<MContraction::TwoPion>("twoPion_U1",
             twoPionPar);
 
