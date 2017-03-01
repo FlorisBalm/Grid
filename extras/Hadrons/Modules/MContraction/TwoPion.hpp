@@ -163,23 +163,12 @@ void TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4>::execute(void)
     //Other traces
     result.corr.resize(buf[0].size());
     
-    LOG(Message) << " Got here to where I put stuff in" << std::endl;
     for (unsigned int t = 0; t < buf[0].size(); ++t)
     {
-        auto tot = TensorRemove(buf[0][t]); 
-        LOG(Message) << " Still no crash" << std::endl;
-        for(int i = 1; i < 4 ; ++i){
-            LOG(Message) << " Still not (2)" << std::endl;
-            if(buf[i].size() != 0){
-                LOG(Message) << " Not (3)" << std::endl;
-                tot *= TensorRemove(buf[i][t]);
-            }
-        }
-        result.corr[t] = tot;
+        result.corr[t] = buf[2][t]*buf[3][t]-buf[0][t]*buf[1][t];
     }
-    write(writer, "meson", result);
+    write(writer, "twopion", result);
 }
-
 END_MODULE_NAMESPACE
 
 END_HADRONS_NAMESPACE

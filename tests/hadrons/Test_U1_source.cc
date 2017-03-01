@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
     globalPar.trajCounter.start = 3425;
     globalPar.trajCounter.end   = 3430;
     globalPar.trajCounter.step  = 5;
-    globalPar.seed              = "1 2 3 4";
+    globalPar.seed              = "1 4 3 2";
     
     application.setPar(globalPar);
     // gauge field
@@ -64,12 +64,12 @@ int main(int argc, char *argv[])
     
     auto latt_size=GridDefaultLatt();
     RealD twoPiL = 2.*M_PI/double(latt_size[3]);
+    std::string momentum = "0 0 " + std::to_string(twoPiL);
     std::stringstream ss;
     ss << "0 0 " << twoPiL;
     std::stringstream ss2;
     ss2 << "0 0 " << -twoPiL;
-    std::string momentum(ss.str()),
-                negative_momentum(ss2.str());
+    std::string negative_momentum(ss2.str());
     
     MSource::U1::Par u1Par_posMomentum;
     u1Par_posMomentum.tA=0;
