@@ -126,13 +126,12 @@ void TStochasticQuark<FImpl>::execute(void)
 {
     if (par().tA == par().tB)
     {
-        LOG(Message) << "Generating gamma_" << par().gamma
-                     << " sequential source at t= " << par().tA << std::endl;
+        LOG(Message) << "Generating source from stochastic noise quark, at time" << 
+                     << par().tA << std::endl;
     }
     else
     {
-        LOG(Message) << "Generating gamma_" << par().gamma
-                     << " sequential source for "
+        LOG(Message) << "Generating band stochastic noise quark source for source for "
                      << par().tA << " <= t <= " << par().tB << std::endl;
     }
     PropagatorField &src = *env().template createLattice<PropagatorField>(getName());

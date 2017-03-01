@@ -45,10 +45,10 @@ class TwoPionPar: Serializable
 {
 public:
     GRID_SERIALIZABLE_CLASS_MEMBERS(TwoPionPar,
-                                    std::string,    q1,
-                                    std::string,    q2,
-                                    std::string,    q3,
-                                    std::string,    q4,
+                                    std::string,    q_pos,
+                                    std::string,    q_neg,
+                                    std::string,    q0_1,
+                                    std::string,    q0_2,
                                     std::string,    mom,
                                     std::string,    output);
 };
@@ -93,7 +93,7 @@ TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4>::TTwoPion(const std::string name)
 template <typename FImpl1, typename FImpl2, typename FImpl3, typename FImpl4>
 std::vector<std::string> TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4>::getInput(void)
 {
-    std::vector<std::string> input = {par().q1, par().q2, par().q3, par().q4};
+    std::vector<std::string> input = {par().q_pos, par().q_neg, par().q0_1, par().q0_2};
     
     return input;
 }
@@ -111,17 +111,19 @@ template <typename FImpl1, typename FImpl2, typename FImpl3, typename FImpl4>
 void TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4>::execute(void)
 {
     LOG(Message) << "Computing meson contractions '" << getName() << "' using"
-                 << " quarks '" << par().q1 << "' and '" << par().q2 << "' and '" 
-                 << par().q3 << "' and '" << par().q4
+                 << " quarks '" << par().q_pos << "' and '" << par().q_neg << "' and '" 
+                 << par().q0_1 << "' and '" << par().q0_2
                  << std::endl;
     XmlWriter             writer(par().output);
-    PropagatorField1      &q1 = *env().template getObject<PropagatorField1>(par().q1);
-    PropagatorField2      &q2 = *env().template getObject<PropagatorField2>(par().q2);
-    PropagatorField3      &q3 = *env().template getObject<PropagatorField3>(par().q3);
-    PropagatorField4      &q4 = *env().template getObject<PropagatorField4>(par().q4);
-    LatticeComplex        c(env().getGrid()),
-                          d(env().getGrid());
-    std::vector<TComplex> buf1,buf2;
+    PropagatorField1      &q_pos = *env().template getObject<PropagatorField1>(par().q_pos);
+    PropagatorField2      &q_neg = *env().template getObject<PropagatorField2>(par().q_neg);
+    PropagatorField3      &q0_1 = *env().template getObject<PropagatorField3>(par().q0_1);
+    PropagatorField4      &q0_2 = *env().template getObject<PropagatorField4>(par().q0_2);
+    LatticeComplex        traceCrossed1(env().getGrid()),
+                          traceCrossed2(env().getGrid()),
+                          tracePaired1(env().getGrid()),
+                          tracePaired2(env().getGrid());
+    std::vector<std::vector<TComplex>> buf;
     Result                result;
 
     LatticeComplex coord(env().getGrid());
@@ -140,18 +142,40 @@ void TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4>::execute(void)
     pyneg = exp(-timesI(py));
     py = exp(timesI(py));
     LOG(Debug) << py << "\n" << pyneg << std::endl;
-    
-    c = trace(py*adj(q1)*q2);
-    d = trace(pyneg*adj(q3)*q4);
+    //Paired diagrams diagram 
+    for(int i = 0; i < 4; ++i){
+        buf.push_back(std::vector<TComplex>());
+    }
 
-    LOG(Debug) << c << "\n" << d << std::endl;
-    sliceSum(c, buf1, Tp);
-    sliceSum(d,buf2,Tp);
-    result.corr.resize(buf1.size());
+    traceCrossed1 = trace(py*adj(q0_1)*q_neg);
+    traceCrossed2 = trace(pyneg*adj(q0_2)*q_pos);
     
-    for (unsigned int t = 0; t < buf1.size(); ++t)
+    sliceSum(traceCrossed1,buf[0],Tp);
+    sliceSum(traceCrossed2,buf[1],Tp);
+
+    tracePaired1 = trace(py*adj(q0_1)*q_pos);
+    tracePaired2 = trace(pyneg*adj(q0_2)*q_neg);
+
+    sliceSum(tracePaired1,buf[2],Tp);
+    sliceSum(tracePaired2,buf[3],Tp);
+
+
+    //Other traces
+    result.corr.resize(buf[0].size());
+    
+    LOG(Message) << " Got here to where I put stuff in" << std::endl;
+    for (unsigned int t = 0; t < buf[0].size(); ++t)
     {
-        result.corr[t] = TensorRemove(buf1[t])*TensorRemove(buf2[t]);
+        auto tot = TensorRemove(buf[0][t]); 
+        LOG(Message) << " Still no crash" << std::endl;
+        for(int i = 1; i < 4 ; ++i){
+            LOG(Message) << " Still not (2)" << std::endl;
+            if(buf[i].size() != 0){
+                LOG(Message) << " Not (3)" << std::endl;
+                tot *= TensorRemove(buf[i][t]);
+            }
+        }
+        result.corr[t] = tot;
     }
     write(writer, "meson", result);
 }

@@ -134,16 +134,17 @@ int main(int argc, char *argv[])
     struct tm* now = localtime(&t);
     
     char buffer[80];
-    strftime(buffer, 80, "%Y%m%d-%H%M%S",now);
+    strftime(buffer, 80, "%Y%m%d",now);
     std::string current_date(buffer);
     strftime(buffer, 80, "%H%M%S",now);
     std::string current_time(buffer); 
 
     twoPionPar.output = "twopion/"+current_date+"/U1_" + current_time;
-    twoPionPar.q1     = "QU1_0";
-    twoPionPar.q2     = "QU1_p";
-    twoPionPar.q3     = "QU1_0_2";
-    twoPionPar.q4     = "QU1_n";
+    std::cout << twoPionPar.output << std::endl;
+    twoPionPar.q0_1     = "QU1_0";
+    twoPionPar.q_pos     = "QU1_p";
+    twoPionPar.q0_2     = "QU1_0_2";
+    twoPionPar.q_neg     = "QU1_n";
     twoPionPar.mom    = momentum;
 
     application.createModule<MContraction::TwoPion>("twoPion_U1",
