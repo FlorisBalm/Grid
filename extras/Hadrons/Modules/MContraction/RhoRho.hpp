@@ -32,6 +32,7 @@ See the full license in the file "LICENSE" in the top level distribution directo
 
 #include <Grid/Hadrons/Global.hpp>
 #include <Grid/Hadrons/Module.hpp>
+#include "Grid/qcd/spin/Gamma.h"
 #include <Grid/Hadrons/ModuleFactory.hpp>
 
 BEGIN_HADRONS_NAMESPACE
@@ -109,27 +110,31 @@ void TRhoRho<FImpl1,FImpl2>::execute(void)
                  << " quarks '" << par().q1 << "' and '" << par().q2 << "'"  
                  << std::endl;
     XmlWriter             writer(par().output);
+
     PropagatorField1      &q1 = *env().template getObject<PropagatorField1>(par().q1);
     PropagatorField2      &q2 = *env().template getObject<PropagatorField2>(par().q2);
-    Algebra::Gamma        g3 = Algebra::Gamma::GammaZ, g5 = Algebra::Gamma:Gamma5;
+
+    Gamma        g(Gamma::Algebra::GammaZGamma5);
     LatticeComplex        c(env().getGrid()); 
 
     std::vector<TComplex> buf;
     Result                result;
-    c = trace(q1*g5*g3*adj(q2)*g5*g3);
-    sliceSum(c,buf,Tp);
+    c = trace(g*q1*g*adj(q2));
+    sliceSum(c, buf, Tp);
 
 
 
     //Other traces
     result.corr.resize(buf.size());
     
-    for (unsigned int t = 0; t < buf[0].size(); ++t)
+    for (unsigned int t = 0; t < buf.size(); ++t)
     {
         result.corr[t] = TensorRemove(buf[t]);
     }
     write(writer, "rhorho", result);
 }
+
+
 END_MODULE_NAMESPACE
 
 END_HADRONS_NAMESPACE

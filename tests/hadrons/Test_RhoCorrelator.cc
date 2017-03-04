@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
 
     Application::GlobalPar globalPar;
     globalPar.trajCounter.start = 3425;
-    globalPar.trajCounter.end   = 3495;
+    globalPar.trajCounter.end   = 3465;
     globalPar.trajCounter.step  = 5;
     globalPar.seed              = "1 4 3 2";
     
