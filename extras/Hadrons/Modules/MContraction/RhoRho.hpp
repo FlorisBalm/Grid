@@ -119,7 +119,7 @@ void TRhoRho<FImpl1,FImpl2>::execute(void)
 
     std::vector<TComplex> buf;
     Result                result;
-    c = trace(g*q1*g*adj(q2));
+    c = -trace(g*q1*g*adj(q2));
     sliceSum(c, buf, Tp);
 
 

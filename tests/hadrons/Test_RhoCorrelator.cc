@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
     MGauge::Load::Par loadPar;
     loadPar.file = "/home/floris/mphys/configurations/ckpoint_lat";
     application.createModule<MGauge::Load>("gauge", loadPar);
-    
+
 
     double mass = 0.1;
     
