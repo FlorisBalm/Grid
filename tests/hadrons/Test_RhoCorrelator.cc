@@ -1,28 +1,28 @@
 /*******************************************************************************
- Grid physics library, www.github.com/paboyle/Grid
- 
- Source file: tests/hadrons/Test_hadrons_spectrum.cc
- 
- Copyright (C) 2015
- 
- Author: Antonin Portelli <antonin.portelli@me.com>
- 
- This program is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 2 of the License, or
- (at your option) any later version.
- 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
- 
- You should have received a copy of the GNU General Public License along
- with this program; if not, write to the Free Software Foundation, Inc.,
- 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- 
- See the full license in the file "LICENSE" in the top level distribution
- directory.
+  Grid physics library, www.github.com/paboyle/Grid
+
+  Source file: tests/hadrons/Test_hadrons_spectrum.cc
+
+  Copyright (C) 2015
+
+Author: Antonin Portelli <antonin.portelli@me.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+See the full license in the file "LICENSE" in the top level distribution
+directory.
  *******************************************************************************/
 
 #include <Grid/Hadrons/Application.hpp>
@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
     HadronsLogIterative.Active(GridLogIterative.isActive());
     HadronsLogDebug.Active(GridLogDebug.isActive());
     LOG(Message) << "Grid initialized" << std::endl;
-    
+
     // run setup ///////////////////////////////////////////////////////////////
     Application              application;
 
@@ -49,51 +49,50 @@ int main(int argc, char *argv[])
 
     Application::GlobalPar globalPar;
     globalPar.trajCounter.start = 3425;
-    globalPar.trajCounter.end   = 3465;
+    globalPar.trajCounter.end   = 3435;
     globalPar.trajCounter.step  = 5;
-    globalPar.seed              = "1 4 3 2";
-    
+    globalPar.seed              = "2 4 1 3";
+
     application.setPar(globalPar);
     // gauge field
     MGauge::Load::Par loadPar;
     loadPar.file = "/home/floris/mphys/configurations/ckpoint_lat";
     application.createModule<MGauge::Load>("gauge", loadPar);
-
-
+    std::cout << "Mass: " << std::endl;
     double mass = 0.1;
-    
+    std::cin >> mass;
+    std::cout << mass;
     MSource::Z2::Par z2par;
     z2par.tA=0;
     z2par.tB=0;
     application.createModule<MSource::Z2>("Z2", z2par);
 
+    char buf[50];
+    sprintf(buf, "%.1f", mass);
+    std::string mass_str(buf);
+
     //Wilson Action
     MAction::Wilson::Par actionPar;
     actionPar.gauge = "gauge";
     actionPar.mass  = mass;
-    application.createModule<MAction::Wilson>("Wilson", actionPar);
+    application.createModule<MAction::Wilson>("Wilson_" + mass_str, actionPar);
 
     // solvers
     MSolver::RBPrecCG::Par solverPar;
-    solverPar.action   = "Wilson";
+    solverPar.action   = "Wilson_"+mass_str;
     solverPar.residual = 1.0e-8;
-    application.createModule<MSolver::RBPrecCG>("CG",solverPar);
+    application.createModule<MSolver::RBPrecCG>("CG_"+mass_str,solverPar);
 
     // propagators
     Quark::Par quarkPar1;
-    quarkPar1.solver = "CG";
+    quarkPar1.solver = "CG_"+mass_str;
     quarkPar1.source = "Z2";
-    application.createModule<Quark>("QZ2_1", quarkPar1);
-
-    Quark::Par quarkPar2;
-    quarkPar2.solver = "CG";
-    quarkPar2.source = "Z2";
-    application.createModule<Quark>("QZ2_2", quarkPar2);
+    application.createModule<Quark>("QZ2_"+mass_str, quarkPar1);
 
 
     time_t t = time(0);
     struct tm* now = localtime(&t);
-    
+
     char buffer[80];
     strftime(buffer, 80, "%Y%m%d",now);
     std::string current_date(buffer);
@@ -101,12 +100,13 @@ int main(int argc, char *argv[])
     std::string current_time(buffer); 
 
     MContraction::RhoRho::Par rhoPar;
-    rhoPar.q1 = "QZ2_1";
-    rhoPar.q2 = "QZ2_1";
-    rhoPar.output= "rhorho/"+current_date+"/Z2_"+current_time;
+    rhoPar.q1 = "QZ2_"+mass_str;
+    rhoPar.q2 = "QZ2_"+mass_str;
+    rhoPar.output= "rhorho/"+current_date+"/Z2_"+current_time+"_m"+mass_str;
 
-    application.createModule<MContraction::RhoRho>("RhoRho_Z2",
+    application.createModule<MContraction::RhoRho>("RhoRho_Z2_"+mass_str,
             rhoPar);
+
 
     // execution
     application.saveParameterFile("RhoRhoZ2.xml");
