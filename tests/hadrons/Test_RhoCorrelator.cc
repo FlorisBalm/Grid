@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
     application.createModule<MSource::Z2>("Z2", z2par);
 
     char buf[50];
-    sprintf(buf, "%.1f", mass);
+    sprintf(buf, "%.2f", mass);
     std::string mass_str(buf);
 
     //Wilson Action
