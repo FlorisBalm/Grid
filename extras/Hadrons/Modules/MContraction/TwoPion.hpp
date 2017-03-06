@@ -64,7 +64,7 @@ public:
     class Result: Serializable
     {
     public:
-        GRID_SERIALIZABLE_CLASS_MEMBERS(Result, std::vector<Complex>, corr);
+        GRID_SERIALIZABLE_CLASS_MEMBERS(Result, std::vector<std::vector<Complex>>, corr);
     };
 public:
     // constructor
@@ -93,7 +93,11 @@ TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4>::TTwoPion(const std::string name)
 template <typename FImpl1, typename FImpl2, typename FImpl3, typename FImpl4>
 std::vector<std::string> TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4>::getInput(void)
 {
+<<<<<<< Updated upstream
     std::vector<std::string> input = {par().q_pos, par().q_neg, par().q0_1, par().q0_2};
+=======
+    std::vector<std::string> input = {par().q_pos_1, par().q_neg_1, par().q0_1_1, par().q0_2_1,par().q_pos_2, par().q_neg_2, par().q0_1_2, par().q0_2_2};
+>>>>>>> Stashed changes
     
     return input;
 }
@@ -161,11 +165,18 @@ void TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4>::execute(void)
 
 
     //Other traces
-    result.corr.resize(buf[0].size());
+    result.corr.push_back(std::vector<Complex>(buf[1].size())); 
+    result.corr.push_back(std::vector<Complex>(buf[2].size())); 
+    
     
     for (unsigned int t = 0; t < buf[0].size(); ++t)
     {
+<<<<<<< Updated upstream
         result.corr[t] = buf[2][t]*buf[3][t]-buf[0][t]*buf[1][t];
+=======
+        result.corr[0][t] =  TensorRemove(buf[2][t])*TensorRemove(buf[3][t]); 
+        result.corr[1][t] = -TensorRemove(buf[0][t])*TensorRemove(buf[1][t]);
+>>>>>>> Stashed changes
     }
     write(writer, "twopion", result);
 }

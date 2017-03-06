@@ -151,7 +151,7 @@ void TStochasticQuark<FImpl>::execute(void)
         LatticeCoordinate(coor, mu);
         ph += p[mu]*coor;
     }
-    ph = exp(i*ph);
+    ph = exp(times(ph));
     LatticeCoordinate(t, Tp);
     src = where((t >= par().tA) and (t <= par().tB), ph*(g5*q), 0.*q);
 }
