@@ -54,7 +54,9 @@ int main(int argc, char *argv[])
     globalPar.seed              = "1 4 3 2";
     
     application.setPar(globalPar);
+    return EXIT_SUCCESS;
     // gauge field
+    /*
     MGauge::Load::Par loadPar;
     loadPar.file = "/home/floris/mphys/configurations/ckpoint_lat";
     application.createModule<MGauge::Load>("gauge", loadPar);
@@ -159,4 +161,5 @@ int main(int argc, char *argv[])
     Grid_finalize();
 
     return EXIT_SUCCESS;
+    */
 }

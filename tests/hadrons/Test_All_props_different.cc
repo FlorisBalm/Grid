@@ -79,7 +79,8 @@ int main(int argc, char *argv[])
     noise2 = exp(timesI(noise2));
 
     ***/
-    std::string noise1="0 2 9 3", noise2="1234 2 3 4"; 
+    std::string noise1="2 122 9 23", noise2="1234 2 356 794"; 
+
     MSource::U1::Par u1Par_posMomentum_1;
     u1Par_posMomentum_1.tA=0;
     u1Par_posMomentum_1.tB=0;

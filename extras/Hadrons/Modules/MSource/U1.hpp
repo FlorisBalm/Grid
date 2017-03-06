@@ -153,7 +153,6 @@ void TU1<FImpl>::execute(void)
     RealD twoPi = 2.*M_PI;
     eta = eta*twoPi;
     eta = exp(timesI(eta));
-    std::cout << eta << std::endl;
     LatticeCoordinate(t,Tp);
     PropagatorField &src = *env().template createLattice<PropagatorField>(getName());
     eta = where((t >= par().tA) and (t <= par().tB), eta, 0.*eta);
