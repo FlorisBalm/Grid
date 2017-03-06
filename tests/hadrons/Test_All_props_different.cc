@@ -64,41 +64,68 @@ int main(int argc, char *argv[])
     
     auto latt_size=GridDefaultLatt();
     RealD twoPiL = 2.*M_PI/double(latt_size[3]);
-    std::string momentum = "0 0 " + std::to_string(twoPiL);
+    std::vector<RealD> momentum = {0.,0.,twoPiL}; 
+    std::string positive_momentum = "0 0 " + std::to_string(twoPiL);
     std::string negative_momentum = "0 0 " + std::to_string(-twoPiL);
+    /*** ALTERNATIVE, BUT I THINK THERE"S NO ENV HERE YET...
+    LatticeComplex noise1(env().getGrid()),
+                   noise2(env().getGrid());
+    random(*env().get4dRng(),noise1);
+    random(*env().get4dRng(),noise2);
 
-    for(int i = 1; i<3; ++i){
-        std::string n = std::to_string(i);
-        
-        MSource::U1::Par u1Par_posMomentum;
-        u1Par_posMomentum.tA=0;
-        u1Par_posMomentum.tB=0;
-        u1Par_posMomentum.mom = momentum;
-        application.createModule<MSource::U1>("u1_p_"+n, u1Par_posMomentum);
+    noise1 = noise1* twoPi;
+    noise2 = noise2* twoPi;
+    noise1 = exp(timesI(noise1));
+    noise2 = exp(timesI(noise2));
+
+    ***/
+    std::string noise1="0 2 9 3", noise2="1234 2 3 4"; 
+    MSource::U1::Par u1Par_posMomentum_1;
+    u1Par_posMomentum_1.tA=0;
+    u1Par_posMomentum_1.tB=0;
+    u1Par_posMomentum_1.mom = positive_momentum;
+    u1Par_posMomentum_1.noise = noise1;
+    application.createModule<MSource::U1>("u1_p_1", u1Par_posMomentum_1);
 
 
-        MSource::U1::Par u1Par_negMomentum;
-        u1Par_negMomentum.tA=0;
-        u1Par_negMomentum.tB=0;
-        u1Par_negMomentum.mom = negative_momentum;
+    MSource::U1::Par u1Par_negMomentum_1;
+    u1Par_negMomentum_1.tA=0;
+    u1Par_negMomentum_1.tB=0;
+    u1Par_negMomentum_1.mom = negative_momentum;
+    u1Par_negMomentum_1.noise = noise2; 
+    application.createModule<MSource::U1>("u1_n_1", u1Par_negMomentum_1);
 
-        application.createModule<MSource::U1>("u1_n_"+n, u1Par_negMomentum);
+
+    MSource::U1::Par u1Par_zeroMomentum;
+    u1Par_zeroMomentum.tA=0;
+    u1Par_zeroMomentum.tB=0;
+    u1Par_zeroMomentum.mom = "0 0 0";
+    u1Par_zeroMomentum.noise=noise1;
+    application.createModule<MSource::U1>("u1_0-1", u1Par_zeroMomentum);
+
+    MSource::U1::Par u1Par_zeroMomentum2;
+    u1Par_zeroMomentum2.tA=0;
+    u1Par_zeroMomentum2.tB=0;
+    u1Par_zeroMomentum2.mom = "0 0 0";
+    u1Par_zeroMomentum2.noise=noise2;
+    application.createModule<MSource::U1>("u1_0-2", u1Par_zeroMomentum2);
+
+    MSource::U1::Par u1Par_posMomentum_2;
+    u1Par_posMomentum_2.tA=0;
+    u1Par_posMomentum_2.tB=0;
+    u1Par_posMomentum_2.mom = positive_momentum;
+    u1Par_posMomentum_2.noise = noise2;
+    application.createModule<MSource::U1>("u1_p_2", u1Par_posMomentum_2);
 
 
-        MSource::U1::Par u1Par_zeroMomentum;
-        u1Par_zeroMomentum.tA=0;
-        u1Par_zeroMomentum.tB=0;
-        u1Par_zeroMomentum.mom = "0 0 0";
+    MSource::U1::Par u1Par_negMomentum_2;
+    u1Par_negMomentum_2.tA=0;
+    u1Par_negMomentum_2.tB=0;
+    u1Par_negMomentum_2.mom = negative_momentum;
+    u1Par_negMomentum_2.noise = noise1;
+    application.createModule<MSource::U1>("u1_n_2", u1Par_negMomentum_2);
 
-        application.createModule<MSource::U1>("u1_0_"+n, u1Par_zeroMomentum);
 
-        MSource::U1::Par u1Par_zeroMomentum2;
-        u1Par_zeroMomentum2.tA=0;
-        u1Par_zeroMomentum2.tB=0;
-        u1Par_zeroMomentum2.mom = "0 0 0";
-
-        application.createModule<MSource::U1>("u1_0-2_"+n, u1Par_zeroMomentum2);
-    } 
 
     //Wilson Action
     MAction::Wilson::Par actionPar;
@@ -112,16 +139,13 @@ int main(int argc, char *argv[])
     solverPar.residual = 1.0e-8;
     application.createModule<MSolver::RBPrecCG>("CG",solverPar);
 
-    std::vector<std::string> propagatorNames = {"u1_p", "u1_n","u1_0","u1_0-2"};
+    std::vector<std::string> propagatorNames = {"u1_p_1","u1_p_2", "u1_n_1",  "u1_n_2", "u1_0-1","u1_0-2"};
     for(auto s : propagatorNames){
-        
-        for(int i = 1; i<3; ++i){
-            std::string n = std::to_string(i); 
-            Quark::Par quarkPar;
-            quarkPar.solver = "CG";
-            quarkPar.source = s + "_" + n;
-            application.createModule<Quark>("Q"+s+"_"+n, quarkPar);
-        }
+
+        Quark::Par quarkPar;
+        quarkPar.solver = "CG";
+        quarkPar.source = s;
+        application.createModule<Quark>("Q"+s, quarkPar);
 
     }
 
@@ -163,16 +187,16 @@ int main(int argc, char *argv[])
     twoPionPar.output = "twopion/"+current_date+"/U1_" + current_time;
     std::cout << twoPionPar.output << std::endl;
      
-    twoPionPar.q0_1_1     = "Qu1_0_1";
+    twoPionPar.q0_1_1     = "Qu1_0-1";
     twoPionPar.q_pos_1     = "Qu1_p_1";
-    twoPionPar.q0_2_1    = "Qu1_0-2_1";
+    twoPionPar.q0_2_1    = "Qu1_0-2";
     twoPionPar.q_neg_1     = "Qu1_n_1";
-    twoPionPar.q0_1_2     = "Qu1_0_2";
+    twoPionPar.q0_1_2     = "Qu1_0-2";
     twoPionPar.q_pos_2     = "Qu1_p_2";
-    twoPionPar.q0_2_2    = "Qu1_0-2_2";
+    twoPionPar.q0_2_2    = "Qu1_0-1";
     twoPionPar.q_neg_2     = "Qu1_n_2";
 
-    twoPionPar.mom    = momentum;
+    twoPionPar.mom    = positive_momentum;
 
     application.createModule<MContraction::TwoPion>("twoPion_U1",
             twoPionPar);

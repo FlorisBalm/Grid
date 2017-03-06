@@ -167,7 +167,7 @@ void TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImpl7,FImpl8>::execute(
     sliceSum(traceCrossed1,buf[0],Tp);
     sliceSum(traceCrossed2,buf[1],Tp);
 
-    tracePaired1 = trace(py*adj(q0_1_1)*q_pos_1);
+    tracePaired1 = trace(py*adj(q0_1_2)*q_pos_2);
     tracePaired2 = trace(pyneg*adj(q0_2_2)*q_neg_2);
 
     sliceSum(tracePaired1,buf[2],Tp);

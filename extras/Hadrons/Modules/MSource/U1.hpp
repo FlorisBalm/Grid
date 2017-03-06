@@ -62,6 +62,7 @@ public:
     GRID_SERIALIZABLE_CLASS_MEMBERS(U1Par,
                                     unsigned int, tA,
                                     unsigned int, tB,
+                                    std::string, noise,
                                     std::string, mom);
 };
 
@@ -126,8 +127,7 @@ template <typename FImpl>
 void TU1<FImpl>::execute(void)
 {
     Lattice<iScalar<vInteger>> t(env().getGrid());
-    LatticeComplex eta (env().getGrid());
-
+    LatticeComplex eta(env().getGrid());
     LatticeComplex coord(env().getGrid());
     LatticeComplex qy(env().getGrid());
     qy=zero;
@@ -147,15 +147,16 @@ void TU1<FImpl>::execute(void)
         LOG(Message) << "Generating U_1 band for " << par().tA << " <= t <= "
         << par().tB << std::endl;
     }
-
+    auto _4DRNG = *env().get4dRng();
+    _4DRNG.SeedFixedIntegers(strToVec<int>(par().noise));
+    random(_4DRNG, eta);
+    RealD twoPi = 2.*M_PI;
+    eta = eta*twoPi;
+    eta = exp(timesI(eta));
 
     LatticeCoordinate(t,Tp);
     PropagatorField &src = *env().template createLattice<PropagatorField>(getName());
-    random(*env().get4dRng(), eta);
-    RealD TwoPi = (2.*M_PI);
-    eta = eta*TwoPi;
     eta = where((t >= par().tA) and (t <= par().tB), eta, 0.*eta);
-    eta = exp(timesI(eta));
     qy = exp(timesI(qy));
     src = 1.;
     src = src*qy*eta;
