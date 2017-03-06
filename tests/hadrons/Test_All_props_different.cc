@@ -48,8 +48,8 @@ int main(int argc, char *argv[])
     // global parameters
 
     Application::GlobalPar globalPar;
-    globalPar.trajCounter.start = 3435;
-    globalPar.trajCounter.end   = 3465;
+    globalPar.trajCounter.start = 3425;
+    globalPar.trajCounter.end   = 3430;
     globalPar.trajCounter.step  = 5;
     globalPar.seed              = "1 4 3 2";
     
@@ -167,7 +167,6 @@ int main(int argc, char *argv[])
     twoPionPar.q_pos_1     = "Qu1_p_1";
     twoPionPar.q0_2_1    = "Qu1_0-2_1";
     twoPionPar.q_neg_1     = "Qu1_n_1";
-    
     twoPionPar.q0_1_2     = "Qu1_0_2";
     twoPionPar.q_pos_2     = "Qu1_p_2";
     twoPionPar.q0_2_2    = "Qu1_0-2_2";

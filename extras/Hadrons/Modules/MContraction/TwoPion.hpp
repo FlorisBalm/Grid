@@ -45,15 +45,19 @@ class TwoPionPar: Serializable
 {
 public:
     GRID_SERIALIZABLE_CLASS_MEMBERS(TwoPionPar,
-                                    std::string,    q_pos,
-                                    std::string,    q_neg,
-                                    std::string,    q0_1,
-                                    std::string,    q0_2,
+                                    std::string,    q_pos_1,
+                                    std::string,    q_neg_1,
+                                    std::string,    q0_1_1,
+                                    std::string,    q0_2_1,
+                                    std::string,    q_pos_2,
+                                    std::string,    q_neg_2,
+                                    std::string,    q0_1_2,
+                                    std::string,    q0_2_2,
                                     std::string,    mom,
                                     std::string,    output);
 };
 
-template <typename FImpl1, typename FImpl2, typename FImpl3, typename FImpl4>
+template <typename FImpl1, typename FImpl2, typename FImpl3, typename FImpl4,typename FImpl5, typename FImpl6, typename FImpl7, typename FImpl8>
 class TTwoPion: public Module<TwoPionPar>
 {
 public:
@@ -61,6 +65,10 @@ public:
     TYPE_ALIASES(FImpl2, 2);
     TYPE_ALIASES(FImpl3, 3);
     TYPE_ALIASES(FImpl4, 4);
+    TYPE_ALIASES(FImpl5, 5);
+    TYPE_ALIASES(FImpl6, 6);
+    TYPE_ALIASES(FImpl7, 7);
+    TYPE_ALIASES(FImpl8, 8);
     class Result: Serializable
     {
     public:
@@ -78,32 +86,28 @@ public:
     virtual void execute(void);
 };
 
-MODULE_REGISTER_NS(TwoPion, ARG(TTwoPion<FIMPL,FIMPL,FIMPL,FIMPL>), MContraction);
+MODULE_REGISTER_NS(TwoPion, ARG(TTwoPion<FIMPL,FIMPL,FIMPL,FIMPL,FIMPL,FIMPL,FIMPL,FIMPL>), MContraction);
 
 /******************************************************************************
  *                           TTwoPion implementation                            *
  ******************************************************************************/
 // constructor /////////////////////////////////////////////////////////////////
-template <typename FImpl1, typename FImpl2, typename FImpl3, typename FImpl4>
-TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4>::TTwoPion(const std::string name)
+template <typename FImpl1, typename FImpl2, typename FImpl3, typename FImpl4,typename FImpl5, typename FImpl6, typename FImpl7, typename FImpl8>
+TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImpl7,FImpl8>::TTwoPion(const std::string name)
 : Module<TwoPionPar>(name)
 {}
 
 // dependencies/products ///////////////////////////////////////////////////////
-template <typename FImpl1, typename FImpl2, typename FImpl3, typename FImpl4>
-std::vector<std::string> TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4>::getInput(void)
+template <typename FImpl1, typename FImpl2, typename FImpl3, typename FImpl4,typename FImpl5, typename FImpl6, typename FImpl7, typename FImpl8>
+std::vector<std::string> TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImpl7,FImpl8>::getInput(void)
 {
-<<<<<<< Updated upstream
-    std::vector<std::string> input = {par().q_pos, par().q_neg, par().q0_1, par().q0_2};
-=======
-    std::vector<std::string> input = {par().q_pos_1, par().q_neg_1, par().q0_1_1, par().q0_2_1,par().q_pos_2, par().q_neg_2, par().q0_1_2, par().q0_2_2};
->>>>>>> Stashed changes
+    std::vector<std::string> input = {par().q_pos_1, par().q_neg_1_1, par().q0_1_1, par().q0_2_1,par().q_pos_2, par().q_neg_2, par().q0_1_2, par().q0_2_2};
     
     return input;
 }
 
-template <typename FImpl1, typename FImpl2, typename FImpl3, typename FImpl4>
-std::vector<std::string> TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4>::getOutput(void)
+template <typename FImpl1, typename FImpl2, typename FImpl3, typename FImpl4,typename FImpl5, typename FImpl6, typename FImpl7, typename FImpl8>
+std::vector<std::string> TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImpl7,FImpl8>::getOutput(void)
 {
     std::vector<std::string> output = {getName()};
     
@@ -111,18 +115,24 @@ std::vector<std::string> TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4>::getOutput(void)
 }
 
 // execution ///////////////////////////////////////////////////////////////////
-template <typename FImpl1, typename FImpl2, typename FImpl3, typename FImpl4>
-void TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4>::execute(void)
+template <typename FImpl1, typename FImpl2, typename FImpl3, typename FImpl4,typename FImpl5, typename FImpl6, typename FImpl7, typename FImpl8>
+void TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImpl7,FImpl8>::execute(void)
 {
-    LOG(Message) << "Computing meson contractions '" << getName() << "' using"
-                 << " quarks '" << par().q_pos << "' and '" << par().q_neg << "' and '" 
-                 << par().q0_1 << "' and '" << par().q0_2
-                 << std::endl;
+//    LOG(Message) << "Computing meson contractions '" << getName() << "' using"
+ //j                << " quarks '" << par().q_pos << "' and '" << par().q_neg << "' and '" 
+   //              << par().q0_1 << "' and '" << par().q0_2
+    //             << std::endl;
     XmlWriter             writer(par().output);
-    PropagatorField1      &q_pos = *env().template getObject<PropagatorField1>(par().q_pos);
-    PropagatorField2      &q_neg = *env().template getObject<PropagatorField2>(par().q_neg);
-    PropagatorField3      &q0_1 = *env().template getObject<PropagatorField3>(par().q0_1);
-    PropagatorField4      &q0_2 = *env().template getObject<PropagatorField4>(par().q0_2);
+    PropagatorField1      &q_pos_1 = *env().template getObject<PropagatorField1>(par().q_pos_1);
+    PropagatorField2      &q_neg_1 = *env().template getObject<PropagatorField2>(par().q_neg_1);
+    PropagatorField3      &q0_1_1 = *env().template getObject<PropagatorField3>(par().q0_1_1);
+    PropagatorField4      &q0_2_1 = *env().template getObject<PropagatorField4>(par().q0_2_1);
+    PropagatorField5      &q_pos_2 = *env().template getObject<PropagatorField5>(par().q_pos_2);
+    PropagatorField6      &q_neg_2 = *env().template getObject<PropagatorField6>(par().q_neg_2);
+    PropagatorField7      &q0_1_2 = *env().template getObject<PropagatorField7>(par().q0_1_2);
+    PropagatorField8      &q0_2_2 = *env().template getObject<PropagatorField8>(par().q0_2_2);
+
+
     LatticeComplex        traceCrossed1(env().getGrid()),
                           traceCrossed2(env().getGrid()),
                           tracePaired1(env().getGrid()),
@@ -151,32 +161,25 @@ void TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4>::execute(void)
         buf.push_back(std::vector<TComplex>());
     }
 
-    traceCrossed1 = trace(py*adj(q0_1)*q_neg);
-    traceCrossed2 = trace(pyneg*adj(q0_2)*q_pos);
+    traceCrossed1 = trace(py*adj(q0_1_1)*q_neg_1);
+    traceCrossed2 = trace(pyneg*adj(q0_2_1)*q_pos_1);
     
     sliceSum(traceCrossed1,buf[0],Tp);
     sliceSum(traceCrossed2,buf[1],Tp);
 
-    tracePaired1 = trace(py*adj(q0_1)*q_pos);
-    tracePaired2 = trace(pyneg*adj(q0_2)*q_neg);
+    tracePaired1 = trace(py*adj(q0_1_2)*q_pos_2);
+    tracePaired2 = trace(pyneg*adj(q0_2_2)*q_neg_2);
 
     sliceSum(tracePaired1,buf[2],Tp);
     sliceSum(tracePaired2,buf[3],Tp);
 
 
     //Other traces
-    result.corr.push_back(std::vector<Complex>(buf[1].size())); 
-    result.corr.push_back(std::vector<Complex>(buf[2].size())); 
-    
+    result.corr.resize(buf[0].size());
     
     for (unsigned int t = 0; t < buf[0].size(); ++t)
     {
-<<<<<<< Updated upstream
-        result.corr[t] = buf[2][t]*buf[3][t]-buf[0][t]*buf[1][t];
-=======
-        result.corr[0][t] =  TensorRemove(buf[2][t])*TensorRemove(buf[3][t]); 
-        result.corr[1][t] = -TensorRemove(buf[0][t])*TensorRemove(buf[1][t]);
->>>>>>> Stashed changes
+        result.corr[t] = TensorRemove(buf[2][t])*TensorRemove(buf[3][t])-TensorRemove(buf[0][t])*TensorRemove(buf[1][t]);
     }
     write(writer, "twopion", result);
 }
