@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
     std::vector<std::string> propagatorNames = {"u1_p", "u1_n","u1_0","u1_0-2"};
     for(auto s : propagatorNames){
         
-        for(int i = 1; i<3; ++i){
+        for(int i = 1; i<2; ++i){
             std::string n = std::to_string(i); 
             Quark::Par quarkPar;
             quarkPar.solver = "CG";
@@ -168,10 +168,10 @@ int main(int argc, char *argv[])
     twoPionPar.q0_2_1    = "Qu1_0-2_1";
     twoPionPar.q_neg_1     = "Qu1_n_1";
     
-    twoPionPar.q0_1_2     = "Qu1_0_2";
-    twoPionPar.q_pos_2     = "Qu1_p_2";
-    twoPionPar.q0_2_2    = "Qu1_0-2_2";
-    twoPionPar.q_neg_2     = "Qu1_n_2";
+    twoPionPar.q0_1_2     = "Qu1_0_1";
+    twoPionPar.q_pos_2     = "Qu1_p_1";
+    twoPionPar.q0_2_2    = "Qu1_0-2_1";
+    twoPionPar.q_neg_2     = "Qu1_n_1";
 
     twoPionPar.mom    = momentum;
 

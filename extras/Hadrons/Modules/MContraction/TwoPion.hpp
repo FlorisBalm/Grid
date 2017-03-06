@@ -101,7 +101,7 @@ TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImpl7,FImpl8>::TTwoPion(cons
 template <typename FImpl1, typename FImpl2, typename FImpl3, typename FImpl4,typename FImpl5, typename FImpl6, typename FImpl7, typename FImpl8>
 std::vector<std::string> TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImpl7,FImpl8>::getInput(void)
 {
-    std::vector<std::string> input = {par().q_pos_1, par().q_neg_1_1, par().q0_1_1, par().q0_2_1,par().q_pos_2, par().q_neg_2, par().q0_1_2, par().q0_2_2};
+    std::vector<std::string> input = {par().q_pos_1, par().q_neg_1, par().q0_1_1, par().q0_2_1,par().q_pos_2, par().q_neg_2, par().q0_1_2, par().q0_2_2};
     
     return input;
 }
@@ -162,12 +162,12 @@ void TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImpl7,FImpl8>::execute(
     }
 
     traceCrossed1 = trace(py*adj(q0_1_1)*q_neg_1);
-    traceCrossed2 = trace(pyneg*adj(q0_2_1)*q_pos_1);
+    traceCrossed2 = trace(pyneg*adj(q0_2_2)*q_pos_2);
     
     sliceSum(traceCrossed1,buf[0],Tp);
     sliceSum(traceCrossed2,buf[1],Tp);
 
-    tracePaired1 = trace(py*adj(q0_1_2)*q_pos_2);
+    tracePaired1 = trace(py*adj(q0_1_1)*q_pos_1);
     tracePaired2 = trace(pyneg*adj(q0_2_2)*q_neg_2);
 
     sliceSum(tracePaired1,buf[2],Tp);
@@ -175,11 +175,13 @@ void TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImpl7,FImpl8>::execute(
 
 
     //Other traces
-    result.corr.resize(buf[0].size());
+    result.corr.push_back(std::vector<Complex>(buf[0].size()));
+    result.corr.push_back(std::vector<Complex>(buf[0].size()));
     
     for (unsigned int t = 0; t < buf[0].size(); ++t)
     {
-        result.corr[t] = TensorRemove(buf[2][t])*TensorRemove(buf[3][t])-TensorRemove(buf[0][t])*TensorRemove(buf[1][t]);
+        result.corr[0][t] =TensorRemove(buf[2][t])*TensorRemove(buf[3][t]); 
+        result.corr[1][t] = -TensorRemove(buf[0][t])*TensorRemove(buf[1][t]);
     }
     write(writer, "twopion", result);
 }
