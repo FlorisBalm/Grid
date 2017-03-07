@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
     noise2 = exp(timesI(noise2));
 
     ***/
-    std::string noise1="2 122 9 23", noise2="1234 2 356 794"; 
+    std::string noise1="2", noise2="1234 2 356 794"; 
 
     MSource::U1::Par u1Par_posMomentum_1;
     u1Par_posMomentum_1.tA=0;
@@ -186,7 +186,6 @@ int main(int argc, char *argv[])
 
     MContraction::TwoPion::Par twoPionPar;
     twoPionPar.output = "twopion/"+current_date+"/U1_" + current_time;
-    std::cout << twoPionPar.output << std::endl;
      
     twoPionPar.q0_1_1     = "Qu1_0-1";
     twoPionPar.q_pos_1     = "Qu1_p_1";

@@ -45,28 +45,29 @@ int main(int argc, char *argv[])
     // run setup ///////////////////////////////////////////////////////////////
     Application              application;
 
+    std::string in1,in2,in3,in4;
+    std::cin >> in1,in2,in3,in4; 
+    std::string seed = in1+"_"+in2+"_"+in3+"_"+in4; 
+
     // global parameters
 
     Application::GlobalPar globalPar;
     globalPar.trajCounter.start = 3425;
     globalPar.trajCounter.end   = 3435;
     globalPar.trajCounter.step  = 5;
-    globalPar.seed              = "2 4 1 3";
+    globalPar.seed              = seed;
 
     application.setPar(globalPar);
     // gauge field
     MGauge::Load::Par loadPar;
     loadPar.file = "/home/floris/mphys/configurations/ckpoint_lat";
     application.createModule<MGauge::Load>("gauge", loadPar);
-    std::cout << "Mass: " << std::endl;
-    double mass = 0.1;
-    std::cin >> mass;
-    std::cout << mass;
     MSource::Z2::Par z2par;
     z2par.tA=0;
     z2par.tB=0;
     application.createModule<MSource::Z2>("Z2", z2par);
 
+    double mass = 0.1;
     char buf[50];
     sprintf(buf, "%.2f", mass);
     std::string mass_str(buf);
@@ -102,7 +103,7 @@ int main(int argc, char *argv[])
     MContraction::RhoRho::Par rhoPar;
     rhoPar.q1 = "QZ2_"+mass_str;
     rhoPar.q2 = "QZ2_"+mass_str;
-    rhoPar.output= "rhorho/"+current_date+"/Z2_"+current_time+"_m"+mass_str;
+    rhoPar.output= "rhorho/"+current_date+"/Z2_"+current_time+"_m"+mass_str+"_"+seed;
 
     application.createModule<MContraction::RhoRho>("RhoRho_Z2_"+mass_str,
             rhoPar);

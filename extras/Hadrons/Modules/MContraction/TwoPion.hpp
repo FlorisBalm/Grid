@@ -177,11 +177,14 @@ void TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImpl7,FImpl8>::execute(
     //Other traces
     result.corr.push_back(std::vector<Complex>(buf[0].size()));
     result.corr.push_back(std::vector<Complex>(buf[0].size()));
+    result.corr.push_back(std::vector<Complex>(buf[0].size()));
     
     for (unsigned int t = 0; t < buf[0].size(); ++t)
     {
         result.corr[0][t] =TensorRemove(buf[2][t])*TensorRemove(buf[3][t]); 
         result.corr[1][t] = -TensorRemove(buf[0][t])*TensorRemove(buf[1][t]);
+        result.corr[2][t] = result.corr[0][t] + result.corr[1][t];
+
     }
     write(writer, "twopion", result);
 }
