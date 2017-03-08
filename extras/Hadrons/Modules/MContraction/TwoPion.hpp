@@ -1,4 +1,5 @@
 /*************************************************************************************
+       py += momentum[mu]*coord;
 
 Grid physics library, www.github.com/paboyle/Grid 
 
@@ -53,11 +54,14 @@ public:
                                     std::string,    q_neg_2,
                                     std::string,    q0_1_2,
                                     std::string,    q0_2_2,
+                                    std::string,    qs_pn,
+                                    std::string,    qs_np,
+                                    std::vector<std::string>, v_qs_p0,
                                     std::string,    mom,
                                     std::string,    output);
 };
 
-template <typename FImpl1, typename FImpl2, typename FImpl3, typename FImpl4,typename FImpl5, typename FImpl6, typename FImpl7, typename FImpl8>
+template <typename FImpl1, typename FImpl2, typename FImpl3, typename FImpl4,typename FImpl5, typename FImpl6, typename FImpl7, typename FImpl8, typename FImpl9, typename FImpl10, typename FImpl11, typename FImpl12>
 class TTwoPion: public Module<TwoPionPar>
 {
 public:
@@ -69,6 +73,10 @@ public:
     TYPE_ALIASES(FImpl6, 6);
     TYPE_ALIASES(FImpl7, 7);
     TYPE_ALIASES(FImpl8, 8);
+    TYPE_ALIASES(FImpl9, 9);
+    TYPE_ALIASES(FImpl10, 10);
+    TYPE_ALIASES(FImpl11, 11);
+    TYPE_ALIASES(FImpl12, 12);
     class Result: Serializable
     {
     public:
@@ -86,28 +94,28 @@ public:
     virtual void execute(void);
 };
 
-MODULE_REGISTER_NS(TwoPion, ARG(TTwoPion<FIMPL,FIMPL,FIMPL,FIMPL,FIMPL,FIMPL,FIMPL,FIMPL>), MContraction);
+MODULE_REGISTER_NS(TwoPion, ARG(TTwoPion<FIMPL,FIMPL,FIMPL,FIMPL,FIMPL,FIMPL,FIMPL,FIMPL,FIMPL,FIMPL,FIMPL,FIMPL>), MContraction);
 
 /******************************************************************************
  *                           TTwoPion implementation                            *
  ******************************************************************************/
 // constructor /////////////////////////////////////////////////////////////////
-template <typename FImpl1, typename FImpl2, typename FImpl3, typename FImpl4,typename FImpl5, typename FImpl6, typename FImpl7, typename FImpl8>
-TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImpl7,FImpl8>::TTwoPion(const std::string name)
+template <typename FImpl1, typename FImpl2, typename FImpl3, typename FImpl4,typename FImpl5, typename FImpl6, typename FImpl7, typename FImpl8, typename FImpl9, typename FImpl10, typename FImpl11, typename FImpl12>
+TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImpl7,FImpl8,FImpl9,FImpl10,FImpl11,FImpl12>::TTwoPion(const std::string name)
 : Module<TwoPionPar>(name)
 {}
 
 // dependencies/products ///////////////////////////////////////////////////////
-template <typename FImpl1, typename FImpl2, typename FImpl3, typename FImpl4,typename FImpl5, typename FImpl6, typename FImpl7, typename FImpl8>
-std::vector<std::string> TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImpl7,FImpl8>::getInput(void)
+template <typename FImpl1, typename FImpl2, typename FImpl3, typename FImpl4,typename FImpl5, typename FImpl6, typename FImpl7, typename FImpl8, typename FImpl9, typename FImpl10, typename FImpl11, typename FImpl12>
+std::vector<std::string> TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImpl7,FImpl8,FImpl9,FImpl10,FImpl11,FImpl12>::getInput(void)
 {
-    std::vector<std::string> input = {par().q_pos_1, par().q_neg_1, par().q0_1_1, par().q0_2_1,par().q_pos_2, par().q_neg_2, par().q0_1_2, par().q0_2_2};
+    std::vector<std::string> input = {par().q_pos_1, par().q_neg_1, par().q0_1_1, par().q0_2_1,par().q_pos_2, par().q_neg_2, par().q0_1_2, par().q0_2_2}
     
     return input;
 }
 
-template <typename FImpl1, typename FImpl2, typename FImpl3, typename FImpl4,typename FImpl5, typename FImpl6, typename FImpl7, typename FImpl8>
-std::vector<std::string> TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImpl7,FImpl8>::getOutput(void)
+template <typename FImpl1, typename FImpl2, typename FImpl3, typename FImpl4,typename FImpl5, typename FImpl6, typename FImpl7, typename FImpl8, typename FImpl9, typename FImpl10, typename FImpl11, typename FImpl12>
+std::vector<std::string> TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImpl7,FImpl8,FImpl9,FImpl10,FImpl11,FImpl12>::getOutput(void)
 {
     std::vector<std::string> output = {getName()};
     
@@ -115,8 +123,8 @@ std::vector<std::string> TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImp
 }
 
 // execution ///////////////////////////////////////////////////////////////////
-template <typename FImpl1, typename FImpl2, typename FImpl3, typename FImpl4,typename FImpl5, typename FImpl6, typename FImpl7, typename FImpl8>
-void TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImpl7,FImpl8>::execute(void)
+template <typename FImpl1, typename FImpl2, typename FImpl3, typename FImpl4,typename FImpl5, typename FImpl6, typename FImpl7, typename FImpl8, typename FImpl9, typename FImpl10, typename FImpl11, typename FImpl12>
+void TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImpl7,FImpl8,FImpl9,FImpl10,FImpl11,FImpl12>::execute(void)
 {
 //    LOG(Message) << "Computing meson contractions '" << getName() << "' using"
  //j                << " quarks '" << par().q_pos << "' and '" << par().q_neg << "' and '" 
@@ -131,6 +139,9 @@ void TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImpl7,FImpl8>::execute(
     PropagatorField6      &q_neg_2 = *env().template getObject<PropagatorField6>(par().q_neg_2);
     PropagatorField7      &q0_1_2 = *env().template getObject<PropagatorField7>(par().q0_1_2);
     PropagatorField8      &q0_2_2 = *env().template getObject<PropagatorField8>(par().q0_2_2);
+    PropagatorField9      &qs_np = *env().template getObject<PropagatorField9>(par().qs_np);
+    PropagatorField10      &qs_pn = *env().template getObject<PropagatorField10>(par().qs_pn);
+
 
 
     LatticeComplex        traceCrossed1(env().getGrid()),
@@ -157,7 +168,7 @@ void TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImpl7,FImpl8>::execute(
     py = exp(timesI(py));
     LOG(Debug) << py << "\n" << pyneg << std::endl;
     //Paired diagrams diagram 
-    for(int i = 0; i < 4; ++i){
+    for(int i = 0; i < 6; ++i){
         buf.push_back(std::vector<TComplex>());
     }
 
@@ -173,18 +184,37 @@ void TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImpl7,FImpl8>::execute(
     sliceSum(tracePaired1,buf[2],Tp);
     sliceSum(tracePaired2,buf[3],Tp);
 
+          
+    Lattice<iScalar<vInteger>> timecoords(env().getGrid());
+    LatticeCoordinate(timecoords,Tp);
+    PropagatorField11 &qs_p0 = *env().template getObject<PropagatorField11>(par().v_qs_p0[0]);
+    qs_p0 = where((timecoords == 0), qs_p0, 0*qs_p0);
+    for (int t = 1; t < Td; ++t){
+        std::string qname = par().v_qs_p0[t];
+
+        PropagatorField12 &qs_p0_t =  *env().template getObject<PropagatorField12>(par().v_qs_p0[t]);
+        qs_p0_t = where(t==timecoords, qs_p0_t, 0*qs_p0_t);
+        qs_p0 += qs_p0_t;
+    }
+    traceSquare = trace(adj(qs_pn)*pyneg*qs_p0);
+    traceHourglass = trace(adj(qs_np)pyneg*qs_p0);
+    
+    sliceSum(traceSquare,buf[4],Tp);
+    sliceSum(traceHourglass,buf[5],Tp);
 
     //Other traces
     result.corr.push_back(std::vector<Complex>(buf[0].size()));
     result.corr.push_back(std::vector<Complex>(buf[0].size()));
     result.corr.push_back(std::vector<Complex>(buf[0].size()));
-    
+    result.corr.push_back(std::vector<Complex>(buf[0].size()));
+    result.corr.push_back(std::vector<Complex>(buf[0].size()));
     for (unsigned int t = 0; t < buf[0].size(); ++t)
     {
-        result.corr[0][t] =TensorRemove(buf[2][t])*TensorRemove(buf[3][t]); 
-        result.corr[1][t] = -TensorRemove(buf[0][t])*TensorRemove(buf[1][t]);
-        result.corr[2][t] = result.corr[0][t] + result.corr[1][t];
-
+        result.corr[0][t] = -TensorRemove(buf[2][t])*TensorRemove(buf[3][t]); 
+        result.corr[1][t] =  TensorRemove(buf[0][t])*TensorRemove(buf[1][t]);
+        result.corr[2][t] =  TensorRemove(buf[4][t]);
+        result.corr[3][t] = -TensorRemove(buf[5][t]);
+        result.corr[4][t] = 2*result.corr[3][t] + 2*result.corr[2][t] + result.corr[1][t] + result.corr[0][t];
     }
     write(writer, "twopion", result);
 }

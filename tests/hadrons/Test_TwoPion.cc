@@ -27,6 +27,7 @@
 
 #include <Grid/Hadrons/Application.hpp>
 #include <Grid/Hadrons/Modules/MSource/U1.hpp>
+#include <Grid/Hadrons/Modules/MSource/StochasticQuark.hpp>
 #include <Grid/Hadrons/Modules/MContraction/TwoPion.hpp>
 using namespace Grid;
 using namespace Hadrons;
@@ -52,6 +53,7 @@ int main(int argc, char *argv[])
     globalPar.trajCounter.end   = 3430;
     globalPar.trajCounter.step  = 5;
     globalPar.seed              = "1 4 3 2";
+    
     application.setPar(globalPar);
     // gauge field
     MGauge::Load::Par loadPar;
@@ -62,10 +64,11 @@ int main(int argc, char *argv[])
     double mass = 0.1;
     
     auto latt_size=GridDefaultLatt();
-    RealD twoPiL = 2.*M_PI/double(latt_size[3]);
+    RealD twoPiL = 2.*M_PI/double(latt_size[Zp]);
     std::vector<RealD> momentum = {0.,0.,twoPiL}; 
     std::string positive_momentum = "0 0 " + std::to_string(twoPiL);
     std::string negative_momentum = "0 0 " + std::to_string(-twoPiL);
+    std::string zero_momentum = "0 0 0";
     /*** ALTERNATIVE, BUT I THINK THERE"S NO ENV HERE YET...
     LatticeComplex noise1(env().getGrid()),
                    noise2(env().getGrid());
@@ -78,7 +81,7 @@ int main(int argc, char *argv[])
     noise2 = exp(timesI(noise2));
 
     ***/
-    std::string noise1="2 122 9 23", noise2="1234 2 356 794"; 
+    std::string noise1="2 123 4323 5", noise2="1234 2 356 794"; 
 
     MSource::U1::Par u1Par_posMomentum_1;
     u1Par_posMomentum_1.tA=0;
@@ -92,29 +95,29 @@ int main(int argc, char *argv[])
     u1Par_negMomentum_1.tA=0;
     u1Par_negMomentum_1.tB=0;
     u1Par_negMomentum_1.mom = negative_momentum;
-    u1Par_negMomentum_1.noise = noise1; 
+    u1Par_negMomentum_1.noise = noise2; 
     application.createModule<MSource::U1>("u1_n_1", u1Par_negMomentum_1);
 
 
     MSource::U1::Par u1Par_zeroMomentum;
     u1Par_zeroMomentum.tA=0;
     u1Par_zeroMomentum.tB=0;
-    u1Par_zeroMomentum.mom = "0 0 0";
+    u1Par_zeroMomentum.mom = zero_momentum;
     u1Par_zeroMomentum.noise=noise1;
     application.createModule<MSource::U1>("u1_0-1", u1Par_zeroMomentum);
 
     MSource::U1::Par u1Par_zeroMomentum2;
     u1Par_zeroMomentum2.tA=0;
     u1Par_zeroMomentum2.tB=0;
-    u1Par_zeroMomentum2.mom = "0 0 0";
-    u1Par_zeroMomentum2.noise=noise1;
+    u1Par_zeroMomentum2.mom = zero_momentum;
+    u1Par_zeroMomentum2.noise=noise2;
     application.createModule<MSource::U1>("u1_0-2", u1Par_zeroMomentum2);
 
     MSource::U1::Par u1Par_posMomentum_2;
     u1Par_posMomentum_2.tA=0;
     u1Par_posMomentum_2.tB=0;
     u1Par_posMomentum_2.mom = positive_momentum;
-    u1Par_posMomentum_2.noise = noise1;
+    u1Par_posMomentum_2.noise = noise2;
     application.createModule<MSource::U1>("u1_p_2", u1Par_posMomentum_2);
 
 
@@ -149,7 +152,32 @@ int main(int argc, char *argv[])
 
     }
 
-    // propagators
+    MSource::StochasticQuark::Par stoch_pos_neg;
+    stoch_pos_neg.q = "Qu1_n_2"; //this needs to be 2 to get constistent noise, it's this now due to 
+                                 //a mess of terminology
+    stoch_pos_neg.tA = 0;
+    stoch_pos_neg.tB = 0;
+    stoch_pos_neg.mom = positive_momentum;
+    application.createModule<MSource::StochasticQuark>("QS_PN",stoch_pos_neg);
+     
+    MSource::StochasticQuark::Par stoch_neg_pos;
+    stoch_neg_pos.q = "Qu1_p_1";
+    stoch_neg_pos.tA = 0;
+    stoch_neg_pos.tB = 0;
+    stoch_neg_pos.mom = negative_momentum;
+    application.createModule<MSource::StochasticQuark>("QS_NP",stoch_neg_pos);
+    std::vector<std::string> wQuarkNames;
+    for(int t = 0; t < Tp; ++t){
+        MSource::StochasticQuark::Par stoch_p_0;
+        stoch_p_0.q = "Qu1_0-1";
+        stoch_p_0.tA = t;
+        stoch_p_0.tB = t;
+        stoch_p_0.mom = zero_momentum;
+        std::string stochname = "QS_P0_"+std::to_string(t);
+        wQuarkNames.push_back(stochname); 
+        application.createModule<MSource::StochasticQuark>(stochname,stoch_p_0);
+    }
+    
     /*
     Quark::Par quarkPar1;
     quarkPar1.solver = "CG";
@@ -185,7 +213,6 @@ int main(int argc, char *argv[])
 
     MContraction::TwoPion::Par twoPionPar;
     twoPionPar.output = "twopion/"+current_date+"/U1_" + current_time;
-    std::cout << twoPionPar.output << std::endl;
      
     twoPionPar.q0_1_1     = "Qu1_0-1";
     twoPionPar.q_pos_1     = "Qu1_p_1";
@@ -195,6 +222,9 @@ int main(int argc, char *argv[])
     twoPionPar.q_pos_2     = "Qu1_p_2";
     twoPionPar.q0_2_2    = "Qu1_0-1";
     twoPionPar.q_neg_2     = "Qu1_n_2";
+    twoPionPar.qs_pn    = "QS_PN";
+    twoPionPar.qs_np    = "QS_NP";
+
 
     twoPionPar.mom    = positive_momentum;
 
