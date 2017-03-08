@@ -127,7 +127,7 @@ void TStochasticQuark<FImpl>::execute(void)
     if (par().tA == par().tB)
     {
         LOG(Message) << "Generating source from stochastic noise quark, at time" << 
-                     << par().tA << std::endl;
+                     par().tA << std::endl;
     }
     else
     {
@@ -140,7 +140,7 @@ void TStochasticQuark<FImpl>::execute(void)
     Lattice<iScalar<vInteger>> t(env().getGrid());
     LatticeComplex             ph(env().getGrid()),
                                coor(env().getGrid());
-    Gamma                      g5(Algebra::Gamma5);
+    Gamma                      g5(Gamma::Algebra::Gamma5);
     std::vector<Real>          p;
     Complex                    i(0.0,1.0);
     
@@ -151,7 +151,7 @@ void TStochasticQuark<FImpl>::execute(void)
         LatticeCoordinate(coor, mu);
         ph += p[mu]*coor;
     }
-    ph = exp(times(ph));
+    ph = exp(timesI(ph));
     LatticeCoordinate(t, Tp);
     src = where((t >= par().tA) and (t <= par().tB), ph*(g5*q), 0.*q);
 }
