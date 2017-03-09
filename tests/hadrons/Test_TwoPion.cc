@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
     u1Par_negMomentum_1.tA=0;
     u1Par_negMomentum_1.tB=0;
     u1Par_negMomentum_1.mom = negative_momentum;
-    u1Par_negMomentum_1.noise = noise2; 
+    u1Par_negMomentum_1.noise = noise1; 
     application.createModule<MSource::U1>("u1_n_1", u1Par_negMomentum_1);
 
 
@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
     u1Par_negMomentum_2.tA=0;
     u1Par_negMomentum_2.tB=0;
     u1Par_negMomentum_2.mom = negative_momentum;
-    u1Par_negMomentum_2.noise = noise1;
+    u1Par_negMomentum_2.noise = noise2;
     application.createModule<MSource::U1>("u1_n_2", u1Par_negMomentum_2);
 
 
@@ -234,14 +234,12 @@ int main(int argc, char *argv[])
     MContraction::TwoPion::Par twoPionPar;
     twoPionPar.output = "twopion/"+current_date+"/Full_" + current_time;
      
-    twoPionPar.q0_1_1     = "Qu1_0-1";
-    twoPionPar.q_pos_1     = "Qu1_p_1";
-    twoPionPar.q0_2_1    = "Qu1_0-2";
-    twoPionPar.q_neg_1     = "Qu1_n_1";
-    twoPionPar.q0_1_2     = "Qu1_0-2";
-    twoPionPar.q_pos_2     = "Qu1_p_2";
-    twoPionPar.q0_2_2    = "Qu1_0-1";
-    twoPionPar.q_neg_2     = "Qu1_n_2";
+    twoPionPar.q0_noise_1     = "Qu1_0-1";
+    twoPionPar.q0_noise_2   = "Qu1_0-2";
+    twoPionPar.q_pos_noise_1     = "Qu1_p_1";
+    twoPionPar.q_pos_noise_2    = "Qu1_p_2";
+    twoPionPar.q_neg_noise_1     = "Qu1_n_1";
+    twoPionPar.q_neg_noise_2     = "Qu1_n_2";
     twoPionPar.qs_pn    = "QS_PN";
     twoPionPar.qs_np    = "QS_NP";
     twoPionPar.v_qs_p0 = wQuarkNames;
