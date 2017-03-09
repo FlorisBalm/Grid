@@ -151,7 +151,6 @@ int main(int argc, char *argv[])
         application.createModule<Quark>("Q"+s, quarkPar);
 
     }
-
     MSource::StochasticQuark::Par stoch_pos_neg;
     stoch_pos_neg.q = "Qu1_n_2"; //this needs to be 2 to get constistent noise, it's this now due to 
                                  //a mess of terminology
@@ -166,17 +165,29 @@ int main(int argc, char *argv[])
     stoch_neg_pos.tB = 0;
     stoch_neg_pos.mom = negative_momentum;
     application.createModule<MSource::StochasticQuark>("QS_NP",stoch_neg_pos);
+
     std::vector<std::string> wQuarkNames;
-    for(int t = 0; t < Tp; ++t){
+    std::vector<std::string> wSourceNames;
+    for(unsigned int t = 0; t < 32; ++t){
         MSource::StochasticQuark::Par stoch_p_0;
         stoch_p_0.q = "Qu1_0-1";
         stoch_p_0.tA = t;
         stoch_p_0.tB = t;
         stoch_p_0.mom = zero_momentum;
-        std::string stochname = "QS_P0_"+std::to_string(t);
-        wQuarkNames.push_back(stochname); 
+        std::string stochname = "S_P0_"+std::to_string(t);
         application.createModule<MSource::StochasticQuark>(stochname,stoch_p_0);
+        wSourceNames.push_back(stochname); 
     }
+    for(unsigned int t = 0; t<wSourceNames.size(); ++t){
+        Quark::Par quarkPar;
+        quarkPar.solver="CG";
+
+        quarkPar.source=wSourceNames[t];
+        wQuarkNames.push_back("Q"+wSourceNames[t]);
+        application.createModule<Quark>(wQuarkNames[t], quarkPar);
+    }
+    for(auto x :wQuarkNames){ std::cout << x << std::endl;}
+    
     
     /*
     Quark::Par quarkPar1;
@@ -212,7 +223,7 @@ int main(int argc, char *argv[])
     std::string current_time(buffer); 
 
     MContraction::TwoPion::Par twoPionPar;
-    twoPionPar.output = "twopion/"+current_date+"/U1_" + current_time;
+    twoPionPar.output = "twopion/"+current_date+"/Full_" + current_time;
      
     twoPionPar.q0_1_1     = "Qu1_0-1";
     twoPionPar.q_pos_1     = "Qu1_p_1";
@@ -224,11 +235,11 @@ int main(int argc, char *argv[])
     twoPionPar.q_neg_2     = "Qu1_n_2";
     twoPionPar.qs_pn    = "QS_PN";
     twoPionPar.qs_np    = "QS_NP";
-
+    twoPionPar.v_qs_p0 = wQuarkNames;
 
     twoPionPar.mom    = positive_momentum;
 
-    application.createModule<MContraction::TwoPion>("twoPion_U1",
+    application.createModule<MContraction::TwoPion>("twoPion_Stochastic",
             twoPionPar);
 
     // execution

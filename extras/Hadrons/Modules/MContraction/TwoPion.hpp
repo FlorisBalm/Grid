@@ -103,13 +103,16 @@ MODULE_REGISTER_NS(TwoPion, ARG(TTwoPion<FIMPL,FIMPL,FIMPL,FIMPL,FIMPL,FIMPL,FIM
 template <typename FImpl1, typename FImpl2, typename FImpl3, typename FImpl4,typename FImpl5, typename FImpl6, typename FImpl7, typename FImpl8, typename FImpl9, typename FImpl10, typename FImpl11, typename FImpl12>
 TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImpl7,FImpl8,FImpl9,FImpl10,FImpl11,FImpl12>::TTwoPion(const std::string name)
 : Module<TwoPionPar>(name)
-{}
+{
+}
 
 // dependencies/products ///////////////////////////////////////////////////////
 template <typename FImpl1, typename FImpl2, typename FImpl3, typename FImpl4,typename FImpl5, typename FImpl6, typename FImpl7, typename FImpl8, typename FImpl9, typename FImpl10, typename FImpl11, typename FImpl12>
 std::vector<std::string> TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImpl7,FImpl8,FImpl9,FImpl10,FImpl11,FImpl12>::getInput(void)
 {
-    std::vector<std::string> input = {par().q_pos_1, par().q_neg_1, par().q0_1_1, par().q0_2_1,par().q_pos_2, par().q_neg_2, par().q0_1_2, par().q0_2_2}
+    std::vector<std::string> f = par().v_qs_p0;
+    std::vector<std::string> input = {par().q_pos_1, par().q_neg_1, par().q0_1_1, par().q0_2_1,par().q_pos_2, par().q_neg_2, par().q0_1_2, par().q0_2_2, par().qs_pn, par().qs_np};
+    input.insert(input.end(), f.begin(), f.end());
     
     return input;
 }
@@ -141,7 +144,7 @@ void TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImpl7,FImpl8,FImpl9,FIm
     PropagatorField8      &q0_2_2 = *env().template getObject<PropagatorField8>(par().q0_2_2);
     PropagatorField9      &qs_np = *env().template getObject<PropagatorField9>(par().qs_np);
     PropagatorField10      &qs_pn = *env().template getObject<PropagatorField10>(par().qs_pn);
-
+ std::cout << " It gets here1" << std::endl;
 
 
     LatticeComplex        traceCrossed1(env().getGrid()),
@@ -150,10 +153,12 @@ void TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImpl7,FImpl8,FImpl9,FIm
                           tracePaired2(env().getGrid());
     std::vector<std::vector<TComplex>> buf;
     Result                result;
-
+ std::cout << " It gets here2" << std::endl;
     LatticeComplex coord(env().getGrid());
     LatticeComplex py(env().getGrid());
     LatticeComplex pyneg(env().getGrid());
+    LatticeComplex traceSquare(env().getGrid());
+    LatticeComplex traceHourglass(env().getGrid());
     
     py=zero;
     pyneg=zero;
@@ -163,7 +168,7 @@ void TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImpl7,FImpl8,FImpl9,FIm
        LOG(Debug) << coord << std::endl;
        py += momentum[mu]*coord;
     }
-    
+     std::cout << " It gets here3" << std::endl;
     pyneg = exp(-timesI(py));
     py = exp(timesI(py));
     LOG(Debug) << py << "\n" << pyneg << std::endl;
@@ -171,7 +176,7 @@ void TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImpl7,FImpl8,FImpl9,FIm
     for(int i = 0; i < 6; ++i){
         buf.push_back(std::vector<TComplex>());
     }
-
+ std::cout << " It gets here4" << std::endl;
     traceCrossed1 = trace(py*adj(q0_1_1)*q_neg_1);
     traceCrossed2 = trace(pyneg*adj(q0_2_2)*q_pos_2);
     
@@ -183,21 +188,27 @@ void TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImpl7,FImpl8,FImpl9,FIm
 
     sliceSum(tracePaired1,buf[2],Tp);
     sliceSum(tracePaired2,buf[3],Tp);
-
+ std::cout << " It gets here5" << std::endl;
           
+ std::cout<< par().v_qs_p0[0];
     Lattice<iScalar<vInteger>> timecoords(env().getGrid());
     LatticeCoordinate(timecoords,Tp);
+    unsigned int Td = 32;
+ std::cout << " It gets here6" << std::endl;
+ std::cout<< par().v_qs_p0[0];
     PropagatorField11 &qs_p0 = *env().template getObject<PropagatorField11>(par().v_qs_p0[0]);
-    qs_p0 = where((timecoords == 0), qs_p0, 0*qs_p0);
+ std::cout << " It gets here6" << std::endl;
+    qs_p0 = where((timecoords >= 0) and (timecoords <=0), qs_p0, 0.*qs_p0);
+    std::cout << " It gets here7" << std::endl;
     for (int t = 1; t < Td; ++t){
         std::string qname = par().v_qs_p0[t];
 
-        PropagatorField12 &qs_p0_t =  *env().template getObject<PropagatorField12>(par().v_qs_p0[t]);
-        qs_p0_t = where(t==timecoords, qs_p0_t, 0*qs_p0_t);
+        PropagatorField12 &qs_p0_t =  *env().template getObject<PropagatorField12>(qname);
+        qs_p0_t = where((timecoords == t), qs_p0_t, 0.*qs_p0_t);
         qs_p0 += qs_p0_t;
     }
     traceSquare = trace(adj(qs_pn)*pyneg*qs_p0);
-    traceHourglass = trace(adj(qs_np)pyneg*qs_p0);
+    traceHourglass = trace(adj(qs_np)*pyneg*qs_p0);
     
     sliceSum(traceSquare,buf[4],Tp);
     sliceSum(traceHourglass,buf[5],Tp);
@@ -214,7 +225,7 @@ void TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImpl7,FImpl8,FImpl9,FIm
         result.corr[1][t] =  TensorRemove(buf[0][t])*TensorRemove(buf[1][t]);
         result.corr[2][t] =  TensorRemove(buf[4][t]);
         result.corr[3][t] = -TensorRemove(buf[5][t]);
-        result.corr[4][t] = 2*result.corr[3][t] + 2*result.corr[2][t] + result.corr[1][t] + result.corr[0][t];
+        result.corr[4][t] = result.corr[3][t]+ result.corr[3][t] + result.corr[2][t] + result.corr[2][t] + result.corr[1][t] + result.corr[0][t];
     }
     write(writer, "twopion", result);
 }
