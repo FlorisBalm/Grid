@@ -144,31 +144,41 @@ int main(int argc, char *argv[])
 
     std::vector<std::string> propagatorNames = {"u1_p_1","u1_p_2", "u1_n_1",  "u1_n_2", "u1_0-1","u1_0-2"};
     for(auto s : propagatorNames){
-
         Quark::Par quarkPar;
         quarkPar.solver = "CG";
         quarkPar.source = s;
         application.createModule<Quark>("Q"+s, quarkPar);
 
     }
+
+
     MSource::StochasticQuark::Par stoch_pos_neg;
     stoch_pos_neg.q = "Qu1_n_2"; //this needs to be 2 to get constistent noise, it's this now due to 
-                                 //a mess of terminology
     stoch_pos_neg.tA = 0;
     stoch_pos_neg.tB = 0;
     stoch_pos_neg.mom = positive_momentum;
-    application.createModule<MSource::StochasticQuark>("QS_PN",stoch_pos_neg);
+    application.createModule<MSource::StochasticQuark>("S_PN",stoch_pos_neg);
      
     MSource::StochasticQuark::Par stoch_neg_pos;
     stoch_neg_pos.q = "Qu1_p_1";
     stoch_neg_pos.tA = 0;
     stoch_neg_pos.tB = 0;
     stoch_neg_pos.mom = negative_momentum;
-    application.createModule<MSource::StochasticQuark>("QS_NP",stoch_neg_pos);
+    application.createModule<MSource::StochasticQuark>("S_NP",stoch_neg_pos);
+    
+    Quark::Par sQuarkPar;
+    sQuarkPar.solver="CG";
+    sQuarkPar.source="S_PN";
+    application.createModule<Quark>("QS_PN",sQuarkPar);
+    
+    Quark::Par sQuarkPar2;
+    sQuarkPar2.solver="CG";
+    sQuarkPar2.source="S_NP";
+    application.createModule<Quark>("QS_NP",sQuarkPar2);
 
     std::vector<std::string> wQuarkNames;
     std::vector<std::string> wSourceNames;
-    for(unsigned int t = 0; t < 32; ++t){
+    for(unsigned int t = 0; t < 4; ++t){
         MSource::StochasticQuark::Par stoch_p_0;
         stoch_p_0.q = "Qu1_0-1";
         stoch_p_0.tA = t;
@@ -186,7 +196,6 @@ int main(int argc, char *argv[])
         wQuarkNames.push_back("Q"+wSourceNames[t]);
         application.createModule<Quark>(wQuarkNames[t], quarkPar);
     }
-    for(auto x :wQuarkNames){ std::cout << x << std::endl;}
     
     
     /*
@@ -243,7 +252,7 @@ int main(int argc, char *argv[])
             twoPionPar);
 
     // execution
-    application.saveParameterFile("U1.xml");
+    application.saveParameterFile("TwoPion.xml");
     application.run();
 
     // epilogue

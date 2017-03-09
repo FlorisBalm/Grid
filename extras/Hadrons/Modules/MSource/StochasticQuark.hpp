@@ -142,7 +142,6 @@ void TStochasticQuark<FImpl>::execute(void)
                                coor(env().getGrid());
     Gamma                      g5(Gamma::Algebra::Gamma5);
     std::vector<Real>          p;
-    Complex                    i(0.0,1.0);
     
     p  = strToVec<Real>(par().mom);
     ph = zero;

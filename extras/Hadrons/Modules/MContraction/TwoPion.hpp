@@ -144,7 +144,6 @@ void TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImpl7,FImpl8,FImpl9,FIm
     PropagatorField8      &q0_2_2 = *env().template getObject<PropagatorField8>(par().q0_2_2);
     PropagatorField9      &qs_np = *env().template getObject<PropagatorField9>(par().qs_np);
     PropagatorField10      &qs_pn = *env().template getObject<PropagatorField10>(par().qs_pn);
- std::cout << " It gets here1" << std::endl;
 
 
     LatticeComplex        traceCrossed1(env().getGrid()),
@@ -153,7 +152,7 @@ void TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImpl7,FImpl8,FImpl9,FIm
                           tracePaired2(env().getGrid());
     std::vector<std::vector<TComplex>> buf;
     Result                result;
- std::cout << " It gets here2" << std::endl;
+
     LatticeComplex coord(env().getGrid());
     LatticeComplex py(env().getGrid());
     LatticeComplex pyneg(env().getGrid());
@@ -162,13 +161,14 @@ void TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImpl7,FImpl8,FImpl9,FIm
     
     py=zero;
     pyneg=zero;
+
     std::vector<Real> momentum = strToVec<Real>(par().mom);
     for(unsigned int mu = 0; mu < env().getNd() - 1; ++mu){
        LatticeCoordinate(coord,mu);
        LOG(Debug) << coord << std::endl;
        py += momentum[mu]*coord;
     }
-     std::cout << " It gets here3" << std::endl;
+
     pyneg = exp(-timesI(py));
     py = exp(timesI(py));
     LOG(Debug) << py << "\n" << pyneg << std::endl;
@@ -176,9 +176,9 @@ void TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImpl7,FImpl8,FImpl9,FIm
     for(int i = 0; i < 6; ++i){
         buf.push_back(std::vector<TComplex>());
     }
- std::cout << " It gets here4" << std::endl;
+
     traceCrossed1 = trace(py*adj(q0_1_1)*q_neg_1);
-    traceCrossed2 = trace(pyneg*adj(q0_2_2)*q_pos_2);
+    traceCrossed2 = trace(pyneg*adj(q0_2_1)*q_pos_1);
     
     sliceSum(traceCrossed1,buf[0],Tp);
     sliceSum(traceCrossed2,buf[1],Tp);
@@ -188,28 +188,21 @@ void TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImpl7,FImpl8,FImpl9,FIm
 
     sliceSum(tracePaired1,buf[2],Tp);
     sliceSum(tracePaired2,buf[3],Tp);
- std::cout << " It gets here5" << std::endl;
-          
- std::cout<< par().v_qs_p0[0];
+     
     Lattice<iScalar<vInteger>> timecoords(env().getGrid());
     LatticeCoordinate(timecoords,Tp);
-    unsigned int Td = 32;
- std::cout << " It gets here6" << std::endl;
- std::cout<< par().v_qs_p0[0];
-    PropagatorField11 &qs_p0 = *env().template getObject<PropagatorField11>(par().v_qs_p0[0]);
- std::cout << " It gets here6" << std::endl;
-    qs_p0 = where((timecoords >= 0) and (timecoords <=0), qs_p0, 0.*qs_p0);
-    std::cout << " It gets here7" << std::endl;
-    for (int t = 1; t < Td; ++t){
-        std::string qname = par().v_qs_p0[t];
 
-        PropagatorField12 &qs_p0_t =  *env().template getObject<PropagatorField12>(qname);
+    PropagatorField11 &qs_p0 = *env().template getObject<PropagatorField11>(par().v_qs_p0[0]);
+    qs_p0 = where((timecoords >= 0) and (timecoords <=0), qs_p0, 0.*qs_p0);
+    for (unsigned int t = 1; t < par().v_qs_p0.size(); ++t){
+        std::string qname = par().v_qs_p0[t];
+        PropagatorField11 &qs_p0_t =  *env().template getObject<PropagatorField11>(qname);
         qs_p0_t = where((timecoords == t), qs_p0_t, 0.*qs_p0_t);
         qs_p0 += qs_p0_t;
     }
-    traceSquare = trace(adj(qs_pn)*pyneg*qs_p0);
-    traceHourglass = trace(adj(qs_np)*pyneg*qs_p0);
-    
+
+    traceSquare = trace(pyneg*qs_p0*adj(qs_pn));
+    traceHourglass = trace(pyneg*qs_p0*adj(qs_np));
     sliceSum(traceSquare,buf[4],Tp);
     sliceSum(traceHourglass,buf[5],Tp);
 
