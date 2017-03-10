@@ -44,10 +44,9 @@ int main(int argc, char *argv[])
 
     // run setup ///////////////////////////////////////////////////////////////
     Application              application;
-
-    std::string in1,in2,in3,in4;
-    std::cin >> in1,in2,in3,in4; 
-    std::string seed = in1+"_"+in2+"_"+in3+"_"+in4; 
+    std::stringstream seed_ss;
+    seed_ss << rand() << " " << rand() << " " << rand() << " " << rand();
+    std::string seed = seed_ss.str();
 
     // global parameters
 
@@ -110,7 +109,7 @@ int main(int argc, char *argv[])
 
 
     // execution
-    application.saveParameterFile("RhoRhoZ2.xml");
+    application.saveParameterFile("rhorho/"+current_date+"/xml/RhoRho"+current_time+".xml");
     application.run();
 
     // epilogue

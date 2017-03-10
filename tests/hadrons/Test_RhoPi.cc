@@ -44,20 +44,21 @@ int main(int argc, char *argv[])
     HadronsLogDebug.Active(GridLogDebug.isActive());
     LOG(Message) << "Grid initialized" << std::endl;
 
+
+    std::stringstream seed_ss, noise1_ss;
+    seed_ss << rand() << " " << rand() << " " << rand() << " " << rand();
+    noise1_ss<< rand() << " " << rand() << " " << rand() << " " << rand(); 
+    std::string seed = seed_ss.str();
+    std::string noise = noise1_ss.str();
+
     // run setup ///////////////////////////////////////////////////////////////
     Application              application;
-    /*
-    std::string in1,in2,in3,in4;
-    std::cin >> in1,in2,in3,in4; 
-    std::string seed = in1+"_"+in2+"_"+in3+"_"+in4; 
-    */
-    // global parameters
 
     Application::GlobalPar globalPar;
     globalPar.trajCounter.start = 3425;
     globalPar.trajCounter.end   = 3435;
     globalPar.trajCounter.step  = 5;
-    globalPar.seed              = "1 2 432 125";
+    globalPar.seed              = seed;
 
     application.setPar(globalPar);
     // gauge field
@@ -93,7 +94,6 @@ int main(int argc, char *argv[])
     std::string negative_momentum = "0 0 " + std::to_string(-twoPiL);
     std::string zero_momentum = "0 0 0";
     
-    std::string noise = "581 291 12 3";
     
     MSource::U1::Par sourcePar_pos;
     sourcePar_pos.tA = 0;

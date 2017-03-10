@@ -42,7 +42,18 @@ int main(int argc, char *argv[])
     HadronsLogIterative.Active(GridLogIterative.isActive());
     HadronsLogDebug.Active(GridLogDebug.isActive());
     LOG(Message) << "Grid initialized" << std::endl;
+
+    //Set up seeds. These are recorded in xml files 
     
+    std::stringstream seed1_ss, noise1_ss, noise2_ss;
+
+    seed1_ss << rand() << " " << rand() << " " << rand() << " " << rand();
+    noise1_ss << rand() << " " << rand() << " " << rand() << " " << rand();
+    noise2_ss << rand() << " " << rand() << " " << rand() << " " << rand();
+
+    std::string seed = seed1_ss.str(),
+                noise1 = noise1_ss.str(),
+                noise2 = noise2_ss.str();
     // run setup ///////////////////////////////////////////////////////////////
     Application              application;
 
@@ -81,7 +92,6 @@ int main(int argc, char *argv[])
     noise2 = exp(timesI(noise2));
 
     ***/
-    std::string noise1="2 123 4323 5", noise2="1234 2 356 794"; 
 
     MSource::U1::Par u1Par_posMomentum_1;
     u1Par_posMomentum_1.tA=0;
