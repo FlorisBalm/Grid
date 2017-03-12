@@ -63,8 +63,8 @@ int main(int argc, char *argv[])
     globalPar.trajCounter.start = 3425;
     globalPar.trajCounter.end   = 3430;
     globalPar.trajCounter.step  = 5;
-    globalPar.seed              = "1 4 3 2";
-    
+    globalPar.seed              = seed;
+
     application.setPar(globalPar);
     // gauge field
     MGauge::Load::Par loadPar;
@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
     application.createModule<MGauge::Load>("gauge", loadPar);
     
 
-    double mass = 0.1;
+    double mass = 0.01;
     
     auto latt_size=GridDefaultLatt();
     RealD twoPiL = 2.*M_PI/double(latt_size[Zp]);
@@ -188,7 +188,8 @@ int main(int argc, char *argv[])
 
     std::vector<std::string> wQuarkNames;
     std::vector<std::string> wSourceNames;
-    for(unsigned int t = 0; t < 4; ++t){
+    int Time = latt_size[Tp];
+    for(unsigned int t = 0; t < Time; ++t){
         MSource::StochasticQuark::Par stoch_p_0;
         stoch_p_0.q = "Qu1_0-1";
         stoch_p_0.tA = t;
