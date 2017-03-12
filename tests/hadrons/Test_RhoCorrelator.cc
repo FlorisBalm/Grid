@@ -28,6 +28,7 @@ directory.
 #include <Grid/Hadrons/Application.hpp>
 #include <Grid/Hadrons/Modules/MSource/Z2.hpp>
 #include <Grid/Hadrons/Modules/MContraction/RhoRho.hpp>
+#include <random>
 using namespace Grid;
 using namespace Hadrons;
 
@@ -44,29 +45,32 @@ int main(int argc, char *argv[])
 
     // run setup ///////////////////////////////////////////////////////////////
     Application              application;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(1,65536);
     std::stringstream seed_ss;
-    seed_ss << rand() << " " << rand() << " " << rand() << " " << rand();
+    seed_ss << dis(gen) << " " << dis(gen) << " " << dis(gen) << " " << dis(gen);
     std::string seed = seed_ss.str();
 
     // global parameters
 
     Application::GlobalPar globalPar;
     globalPar.trajCounter.start = 3425;
-    globalPar.trajCounter.end   = 3435;
+    globalPar.trajCounter.end   = 3475;
     globalPar.trajCounter.step  = 5;
     globalPar.seed              = seed;
 
     application.setPar(globalPar);
     // gauge field
     MGauge::Load::Par loadPar;
-    loadPar.file = "/home/floris/mphys/configurations/ckpoint_lat";
+    loadPar.file = "/home/s1205916/mphys/configurations/ckpoint_lat";
     application.createModule<MGauge::Load>("gauge", loadPar);
     MSource::Z2::Par z2par;
     z2par.tA=0;
     z2par.tB=0;
     application.createModule<MSource::Z2>("Z2", z2par);
 
-    double mass = 0.1;
+    double mass = 0.01;
     char buf[50];
     sprintf(buf, "%.2f", mass);
     std::string mass_str(buf);
@@ -102,7 +106,7 @@ int main(int argc, char *argv[])
     MContraction::RhoRho::Par rhoPar;
     rhoPar.q1 = "QZ2_"+mass_str;
     rhoPar.q2 = "QZ2_"+mass_str;
-    rhoPar.output= "rhorho/"+current_date+"/Z2_"+current_time+"_m"+mass_str+"_"+seed;
+    rhoPar.output= "rhorho/"+current_date+"/RR_"+current_time;
 
     application.createModule<MContraction::RhoRho>("RhoRho_Z2_"+mass_str,
             rhoPar);

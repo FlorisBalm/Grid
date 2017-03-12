@@ -29,6 +29,7 @@
 #include <Grid/Hadrons/Modules/MSource/U1.hpp>
 #include <Grid/Hadrons/Modules/MSource/StochasticQuark.hpp>
 #include <Grid/Hadrons/Modules/MContraction/TwoPion.hpp>
+#include <random>
 using namespace Grid;
 using namespace Hadrons;
 
@@ -45,11 +46,15 @@ int main(int argc, char *argv[])
 
     //Set up seeds. These are recorded in xml files 
     
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(1,65536);
+    
     std::stringstream seed1_ss, noise1_ss, noise2_ss;
 
-    seed1_ss << rand() << " " << rand() << " " << rand() << " " << rand();
-    noise1_ss << rand() << " " << rand() << " " << rand() << " " << rand();
-    noise2_ss << rand() << " " << rand() << " " << rand() << " " << rand();
+    seed1_ss << dis(gen) << " " << dis(gen) << " " << dis(gen) << " " << dis(gen);
+    noise1_ss << dis(gen) << " " << dis(gen) << " " << dis(gen) << " " << dis(gen);
+    noise2_ss << dis(gen) << " " << dis(gen) << " " << dis(gen) << " " << dis(gen);
 
     std::string seed = seed1_ss.str(),
                 noise1 = noise1_ss.str(),
@@ -61,18 +66,18 @@ int main(int argc, char *argv[])
 
     Application::GlobalPar globalPar;
     globalPar.trajCounter.start = 3425;
-    globalPar.trajCounter.end   = 3430;
+    globalPar.trajCounter.end   = 3445;
     globalPar.trajCounter.step  = 5;
-    globalPar.seed              = "1 4 3 2";
+    globalPar.seed              = seed;
     
     application.setPar(globalPar);
     // gauge field
     MGauge::Load::Par loadPar;
-    loadPar.file = "/home/floris/mphys/configurations/ckpoint_lat";
+    loadPar.file = "/home/s1205916/mphys/configurations/ckpoint_lat";
     application.createModule<MGauge::Load>("gauge", loadPar);
     
 
-    double mass = 0.1;
+    double mass = 0.01;
     
     auto latt_size=GridDefaultLatt();
     RealD twoPiL = 2.*M_PI/double(latt_size[Zp]);
@@ -188,7 +193,8 @@ int main(int argc, char *argv[])
 
     std::vector<std::string> wQuarkNames;
     std::vector<std::string> wSourceNames;
-    for(unsigned int t = 0; t < 4; ++t){
+    unsigned int Time = latt_size[Tp];
+    for(unsigned int t = 0; t < Time; ++t){
         MSource::StochasticQuark::Par stoch_p_0;
         stoch_p_0.q = "Qu1_0-1";
         stoch_p_0.tA = t;
@@ -260,7 +266,7 @@ int main(int argc, char *argv[])
             twoPionPar);
 
     // execution
-    application.saveParameterFile("TwoPion.xml");
+    application.saveParameterFile("twopion/"+current_date+"/xml/PiPi_"+current_time);
     application.run();
 
     // epilogue
