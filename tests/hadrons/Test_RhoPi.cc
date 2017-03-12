@@ -30,6 +30,7 @@ directory.
 #include <Grid/Hadrons/Modules/MSource/StochasticQuark.hpp>
 #include <Grid/Hadrons/Modules/MContraction/RhoRho.hpp>
 #include <Grid/Hadrons/Modules/MContraction/RhoPi.hpp>
+#include <random>
 using namespace Grid;
 using namespace Hadrons;
 
@@ -44,31 +45,33 @@ int main(int argc, char *argv[])
     HadronsLogDebug.Active(GridLogDebug.isActive());
     LOG(Message) << "Grid initialized" << std::endl;
 
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(1,65536);
 
     std::stringstream seed_ss, noise1_ss;
-    seed_ss << rand() << " " << rand() << " " << rand() << " " << rand();
-    noise1_ss<< rand() << " " << rand() << " " << rand() << " " << rand(); 
+    seed_ss << dis(gen) << " " << dis(gen) << " " << dis(gen) << " " << dis(gen);
+    noise1_ss<< dis(gen) << " " << dis(gen) << " " << dis(gen) << " " << dis(gen); 
     std::string seed = seed_ss.str();
     std::string noise = noise1_ss.str();
-
     // run setup ///////////////////////////////////////////////////////////////
     Application              application;
 
     Application::GlobalPar globalPar;
     globalPar.trajCounter.start = 3425;
-    globalPar.trajCounter.end   = 3435;
+    globalPar.trajCounter.end   = 3475;
     globalPar.trajCounter.step  = 5;
     globalPar.seed              = seed;
 
     application.setPar(globalPar);
     // gauge field
     MGauge::Load::Par loadPar;
-    loadPar.file = "/home/floris/mphys/configurations/ckpoint_lat";
+    loadPar.file = "/home/s1205916/mphys/configurations/ckpoint_lat";
     application.createModule<MGauge::Load>("gauge", loadPar);
 
 
 
-    double mass = 0.1;
+    double mass = 0.01;
     char buf[50];
     sprintf(buf, "%.2f", mass);
     std::string mass_str(buf);
@@ -88,7 +91,7 @@ int main(int argc, char *argv[])
 
     //Sources for quarks
     auto latt_size=GridDefaultLatt();
-    RealD twoPiL = 2.*M_PI/double(latt_size[3]);
+    RealD twoPiL = 2.*M_PI/double(latt_size[Zp]);
     std::vector<RealD> momentum = {0.,0.,twoPiL}; 
     std::string positive_momentum = "0 0 " + std::to_string(twoPiL);
     std::string negative_momentum = "0 0 " + std::to_string(-twoPiL);
@@ -175,7 +178,7 @@ int main(int argc, char *argv[])
     application.createModule<MContraction::RhoPi>("rhopi",rhoPiPar);
 
     // execution
-    application.saveParameterFile("RhoPi.xml");
+    application.saveParameterFile("rhopi/"+current_date+"/xml/RP_"+current_time);
     application.run();
 
     // epilogue
