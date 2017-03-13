@@ -167,7 +167,7 @@ int main(int argc, char *argv[])
 
 
     MSource::StochasticQuark::Par stoch_pos_neg;
-    stoch_pos_neg.q = "Qu1_n_2"; //this needs to be 2 to get constistent noise, it's this now due to 
+    stoch_pos_neg.q = "Qu1_n_1";
     stoch_pos_neg.tA = 0;
     stoch_pos_neg.tB = 0;
     stoch_pos_neg.mom = positive_momentum;

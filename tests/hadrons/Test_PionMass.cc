@@ -28,6 +28,7 @@ directory.
 #include <Grid/Hadrons/Application.hpp>
 #include <Grid/Hadrons/Modules/MSource/Z2.hpp>
 #include <Grid/Hadrons/Modules/MContraction/RhoRho.hpp>
+#include <Grid/Hadrons/Modules/MSource/U1.hpp>
 using namespace Grid;
 using namespace Hadrons;
 
@@ -44,53 +45,42 @@ int main(int argc, char *argv[])
 
     // run setup ///////////////////////////////////////////////////////////////
     Application              application;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(1,65536);
     std::stringstream seed_ss;
-    seed_ss << rand() << " " << rand() << " " << rand() << " " << rand();
+    seed_ss << dis(gen) << " " << dis(gen) << " " << dis(gen) << " " << dis(gen);
     std::string seed = seed_ss.str();
 
     // global parameters
 
     Application::GlobalPar globalPar;
     globalPar.trajCounter.start = 3425;
-    globalPar.trajCounter.end   = 3485;
+    globalPar.trajCounter.end   = 3430;
     globalPar.trajCounter.step  = 5;
     globalPar.seed              = seed;
 
     application.setPar(globalPar);
     // gauge field
-    MGauge::Load::Par loadPar;
-    loadPar.file = "/home/floris/mphys/configurations/ckpoint_lat";
-    application.createModule<MGauge::Load>("gauge", loadPar);
+//    MGauge::Load::Par loadPar;
+ //   loadPar.file = "/home/floris/mphys/configurations/ckpoint_lat";
+    application.createModule<MGauge::Unit>("gauge");
 
     MSource::Z2::Par z2par;
     z2par.tA=0;
     z2par.tB=0;
     application.createModule<MSource::Z2>("Z2", z2par);
 
-    for(double mass = 0.0025; mass < 0.1; mass += 0.0025){
+    MSource::Point::Par pointPar;
+    pointPar.position="0 0 0 0";
+    application.createModule<MSource::Point>("Pt",pointPar);
 
-    char buf[50];
-    sprintf(buf, "%.4f", mass);
-    std::string mass_str(buf);
-
-    //Wilson Action
-    MAction::Wilson::Par actionPar;
-    actionPar.gauge = "gauge";
-    actionPar.mass  = mass;
-    application.createModule<MAction::Wilson>("Wilson_" + mass_str, actionPar);
-
-    // solvers
-    MSolver::RBPrecCG::Par solverPar;
-    solverPar.action   = "Wilson_"+mass_str;
-    solverPar.residual = 1.0e-8;
-    application.createModule<MSolver::RBPrecCG>("CG_"+mass_str,solverPar);
-
-    // propagators
-    Quark::Par quarkPar1;
-    quarkPar1.solver = "CG_"+mass_str;
-    quarkPar1.source = "Z2";
-    application.createModule<Quark>("QZ2_"+mass_str, quarkPar1);
-
+    MSource::U1::Par u1par;
+    u1par.tA = 0;
+    u1par.tB = 0;
+    u1par.noise="548 6846 246 32";
+    u1par.mom = "0 0 0 0";
+    application.createModule<MSource::U1>("U1",u1par);
 
     time_t t = time(0);
     struct tm* now = localtime(&t);
@@ -100,17 +90,43 @@ int main(int argc, char *argv[])
     std::string current_date(buffer);
     strftime(buffer, 80, "%H%M%S",now);
     std::string current_time(buffer); 
-    Gamma g5(Gamma::Algebra::Gamma5);
 
-    MContraction::Meson::Par mesPar;
-    mesPar.q1 = "QZ2_"+mass_str;
-    mesPar.q2 = "QZ2_"+mass_str;
-    mesPar.gammaSource = g5;
-    mesPar.gammaSink = g5;
-    mesPar.output= "pionmass/"+current_date+"/PionMass_"+current_time+"_m"+mass_str;
+    for(double mass = -0.7; mass < .7; mass += 0.1){
 
-    application.createModule<MContraction::Meson>("RhoRho_Z2_"+mass_str,
-            mesPar);
+        char buf[50];
+        sprintf(buf, "%.4f", mass);
+        std::string mass_str(buf);
+
+        //Wilson Action
+        MAction::Wilson::Par actionPar;
+        actionPar.gauge = "gauge";
+        actionPar.mass  = mass;
+        application.createModule<MAction::Wilson>("Wilson_" + mass_str, actionPar);
+
+        // solvers
+        MSolver::RBPrecCG::Par solverPar;
+        solverPar.action   = "Wilson_"+mass_str;
+        solverPar.residual = 1.0e-8;
+        application.createModule<MSolver::RBPrecCG>("CG_"+mass_str,solverPar);
+
+        // propagators
+        Quark::Par quarkPar1;
+        quarkPar1.solver = "CG_"+mass_str;
+        quarkPar1.source = "U1";
+        application.createModule<Quark>("QPt_"+mass_str, quarkPar1);
+
+
+        Gamma g5(Gamma::Algebra::Gamma5);
+
+        MContraction::Meson::Par mesPar;
+        mesPar.q1 = "QPt_"+mass_str;
+        mesPar.q2 = "QPt_"+mass_str;
+        mesPar.gammaSource = Gamma::Algebra::Gamma5;
+        mesPar.gammaSink = Gamma::Algebra::Gamma5;
+        mesPar.output= "pionmass/"+current_date+"/PionMass_"+current_time+"_m"+mass_str;
+
+        application.createModule<MContraction::Meson>("PionMass_"+mass_str,
+                mesPar);
     }
 
     // execution
