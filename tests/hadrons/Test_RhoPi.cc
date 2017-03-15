@@ -58,8 +58,8 @@ int main(int argc, char *argv[])
     Application              application;
 
     Application::GlobalPar globalPar;
-    globalPar.trajCounter.start = 3425;
-    globalPar.trajCounter.end   = 3475;
+    globalPar.trajCounter.start = 3445;
+    globalPar.trajCounter.end   = 3450;
     globalPar.trajCounter.step  = 5;
     globalPar.seed              = seed;
 
@@ -71,9 +71,9 @@ int main(int argc, char *argv[])
 
 
 
-    double mass = 0.01;
+    double mass = -0.769;
     char buf[50];
-    sprintf(buf, "%.2f", mass);
+    sprintf(buf, "%.3f", mass);
     std::string mass_str(buf);
 
     //Wilson Action
@@ -146,7 +146,7 @@ int main(int argc, char *argv[])
     wtype2par.q = "Qu1_n";
     wtype2par.tA = 0;
     wtype2par.tB = 0;
-    wtype2par.mom = negative_momentum;
+    wtype2par.mom = positive_momentum;
     application.createModule<MSource::StochasticQuark>("Stoc2", wtype1par);
 
     // propagators
@@ -171,7 +171,7 @@ int main(int argc, char *argv[])
     std::string current_time(buffer); 
 
     MContraction::RhoPi::Par rhoPiPar;
-    rhoPiPar.output= "rhopi/"+current_date+"/RP_"+current_time;
+    rhoPiPar.output= "rhopi/"+current_date+"/PR_"+current_time;
     rhoPiPar.q1 = "Qu1_0";
     rhoPiPar.q2 = "QS1";
     rhoPiPar.q3 = "QS2";

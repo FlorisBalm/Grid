@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
     // global parameters
 
     Application::GlobalPar globalPar;
-    globalPar.trajCounter.start = 3425;
+    globalPar.trajCounter.start = 3445;
     globalPar.trajCounter.end   = 3475;
     globalPar.trajCounter.step  = 5;
     globalPar.seed              = seed;
@@ -70,9 +70,9 @@ int main(int argc, char *argv[])
     z2par.tB=0;
     application.createModule<MSource::Z2>("Z2", z2par);
 
-    double mass = 0.01;
+    double mass = -0.769;
     char buf[50];
-    sprintf(buf, "%.2f", mass);
+    sprintf(buf, "%.3f", mass);
     std::string mass_str(buf);
 
     //Wilson Action

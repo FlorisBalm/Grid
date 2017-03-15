@@ -65,8 +65,8 @@ int main(int argc, char *argv[])
     // global parameters
 
     Application::GlobalPar globalPar;
-    globalPar.trajCounter.start = 3425;
-    globalPar.trajCounter.end   = 3445;
+    globalPar.trajCounter.start = 3445;
+    globalPar.trajCounter.end   = 3450;
     globalPar.trajCounter.step  = 5;
     globalPar.seed              = seed;
     application.setPar(globalPar);
@@ -75,8 +75,7 @@ int main(int argc, char *argv[])
     loadPar.file = "/home/s1205916/mphys/configurations/ckpoint_lat";
     application.createModule<MGauge::Load>("gauge", loadPar);
     
-
-    double mass = 0.01;
+    double mass = -0.769;
     
     auto latt_size=GridDefaultLatt();
     RealD twoPiL = 2.*M_PI/double(latt_size[Zp]);
@@ -167,7 +166,7 @@ int main(int argc, char *argv[])
 
 
     MSource::StochasticQuark::Par stoch_pos_neg;
-    stoch_pos_neg.q = "Qu1_n_2"; //this needs to be 2 to get constistent noise, it's this now due to 
+    stoch_pos_neg.q = "Qu1_n_1"; //this needs to be 2 to get constistent noise, it's this now due to 
     stoch_pos_neg.tA = 0;
     stoch_pos_neg.tB = 0;
     stoch_pos_neg.mom = positive_momentum;
@@ -212,30 +211,6 @@ int main(int argc, char *argv[])
         application.createModule<Quark>(wQuarkNames[t], quarkPar);
     }
     
-    
-    /*
-    Quark::Par quarkPar1;
-    quarkPar1.solver = "CG";
-    quarkPar1.source = "u1_p";
-    application.createModule<Quark>("QU1_p", quarkPar1);
-
-    Quark::Par quarkPar2;
-    quarkPar2.solver = "CG";
-    quarkPar2.source = "u1_0";
-    application.createModule<Quark>("QU1_0", quarkPar2);
-
-
-    Quark::Par quarkPar3;
-    quarkPar3.solver = "CG";
-    quarkPar3.source = "u1_n";
-    application.createModule<Quark>("QU1_n", quarkPar3);
-
-    Quark::Par quarkPar4;
-    quarkPar4.solver = "CG";
-    quarkPar4.source = "u1_0";
-    application.createModule<Quark>("QU1_0_2", quarkPar4);
-
-    */
     
     time_t t = time(0);
     struct tm* now = localtime(&t);

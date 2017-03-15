@@ -165,7 +165,7 @@ void TTwoPion<FImpl1,FImpl2,FImpl3,FImpl4,FImpl5,FImpl6,FImpl7,FImpl8,FImpl9,FIm
 
     pyneg = exp(-timesI(py));
     py = exp(timesI(py));
-    LOG(Debug) << py << "\n" << pyneg << std::endl;
+    //LOG(Debug) << py << "\n" << pyneg << std::endl;
     //Paired diagrams diagram 
     for(int i = 0; i < 6; ++i){
         buf.push_back(std::vector<TComplex>());
